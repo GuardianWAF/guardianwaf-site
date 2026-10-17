@@ -37,7 +37,7 @@ The included `.github/workflows/pages.yml` performs installation, lint, type che
 3. In **Settings → Pages → Build and deployment**, select **GitHub Actions**.
 4. Run the workflow or push to `main`. The deployment URL appears in the Actions run.
 
-`actions/configure-pages` supplies the correct `base_path` and `base_url`. The same source supports `https://guardianwaf.github.io/guardianwaf-site/` and a configured custom domain. Next.js links, fonts, brand downloads, social images, canonicals, and sitemap follow these settings.
+`actions/configure-pages` supplies the correct `base_path`. Production metadata uses `https://guardianwaf.com`; the default GitHub Pages address redirects to the configured custom domain. Next.js links, fonts, and brand downloads follow the Pages base path, while social images, canonicals, and sitemap use the production origin.
 
 To rehearse a project-subpath export locally:
 
@@ -53,9 +53,9 @@ npm run preview
 
 Clear the two `NEXT_PUBLIC_*` variables and rebuild to return to a root export. These variables are build-time values.
 
-### Custom domain later
+### Custom domain: guardianwaf.com
 
-Configure `guardianwaf.com` in the repository’s Pages settings and follow GitHub’s current DNS and domain-verification guidance. Enable HTTPS after domain validation. The workflow uses Pages metadata on the next build. A `CNAME` file is deliberately absent until the intended domain is configured; this source does not change DNS or the existing live site.
+The custom domain is `guardianwaf.com`; `public/CNAME` includes this value in every static export. With GitHub Actions publishing, the repository’s Pages custom-domain setting controls domain routing. The workflow reads that setting for the root base path and explicitly uses `https://guardianwaf.com` for metadata and sitemap URLs. The apex domain needs GitHub Pages A/AAAA records. The optional `www` variant requires its own DNS record and is not part of the apex-domain setup.
 
 ## Brand assets
 
