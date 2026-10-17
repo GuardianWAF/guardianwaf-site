@@ -1669,7 +1669,7 @@ code,
   display: block;
   width: 100%;
 }
-.studio-signature:not([data-logo-state="static"]) .studio-symbol path {
+.studio-signature .studio-symbol path {
   stroke-dasharray: 400;
   stroke-dashoffset: 400;
 }
