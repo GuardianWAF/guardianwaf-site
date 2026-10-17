@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
 import { Github, LogoMark } from "./brand";
 import { REPO } from "@/lib/site";
+import { StudioSignature } from "./studio-signature";
 
 export function Header() {
   const [theme, setTheme] = useState("dark");
@@ -139,6 +140,7 @@ export function Footer() {
           </a>
         </div>
       </div>
+      <StudioSignature />
       <div className="footer-bottom">
         <span>
           © {new Date().getFullYear()} GuardianWAF. Open source under MIT.
