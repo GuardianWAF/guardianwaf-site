@@ -2,42 +2,23 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowRight, ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Menu, X } from "lucide-react";
 import { Github, LogoMark } from "./brand";
 import { REPO } from "@/lib/site";
 import { StudioSignature } from "./studio-signature";
+import { ThemeMenu } from "./theme-menu";
 
 export function Header() {
-  const [theme, setTheme] = useState("dark");
   const [menu, setMenu] = useState(false);
   useEffect(() => {
-    const sync = () =>
-      setTheme(document.documentElement.dataset.theme || "dark");
-    sync();
-    const observer = new MutationObserver(sync);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMenu(false);
     };
     document.addEventListener("keydown", onKey);
     return () => {
-      observer.disconnect();
       document.removeEventListener("keydown", onKey);
     };
   }, []);
-  function toggleTheme() {
-    const next = theme === "dark" ? "light" : "dark";
-    document.documentElement.dataset.theme = next;
-    setTheme(next);
-    try {
-      localStorage.setItem("guardian-theme", next);
-    } catch {
-      /* Storage can be disabled. */
-    }
-  }
   return (
     <header className="site-header">
       <div className="nav-wrap">
@@ -57,14 +38,7 @@ export function Header() {
           </Link>
         </nav>
         <div className="nav-actions">
-          <button
-            className="icon-button theme-toggle"
-            onClick={toggleTheme}
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-            suppressHydrationWarning
-          >
-            {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
-          </button>
+          <ThemeMenu />
           <a
             className="github-nav"
             aria-label="GuardianWAF on GitHub"

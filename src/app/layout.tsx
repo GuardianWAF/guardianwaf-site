@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Header, Footer } from "@/components/chrome";
 import { asset, siteUrl } from "@/lib/site";
+import { themeScript } from "@/lib/theme";
 import "./globals.css";
 
 const geist = localFont({
@@ -52,8 +53,6 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: light)", color: "#f6f7f2" },
   ],
 };
-
-const themeScript = `(function(){try{var s=localStorage.getItem('guardian-theme');var q=window.matchMedia('(prefers-color-scheme: light)');document.documentElement.dataset.theme=s==='light'||s==='dark'?s:q.matches?'light':'dark';q.addEventListener('change',function(e){if(!localStorage.getItem('guardian-theme'))document.documentElement.dataset.theme=e.matches?'light':'dark'})}catch(e){}})()`;
 
 export default function RootLayout({
   children,
