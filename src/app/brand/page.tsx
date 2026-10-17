@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Download } from "lucide-react";
 import Image from "next/image";
-import { asset, siteUrl } from "@/lib/site";
+import { brandAsset, siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Brand assets",
@@ -44,7 +44,7 @@ export default function Brand() {
           <div className="brand-card" key={file}>
             <div className={`brand-preview brand-preview-${mode}`}>
               <Image
-                src={asset(`/brand/${file}`)}
+                src={brandAsset(`/brand/${file}`)}
                 alt={`GuardianWAF ${i < 2 || i > 3 ? "logo" : "shield"} for ${mode} backgrounds`}
                 width={i < 2 ? 269 : i > 3 ? 190 : 75}
                 height={i < 2 ? 48 : i > 3 ? 190 : 90}
@@ -59,7 +59,7 @@ export default function Brand() {
             </div>
             <div className="brand-card-footer">
               <span>{name}</span>
-              <a href={asset(`/brand/${file}`)} download={file}>
+              <a href={brandAsset(`/brand/${file}`)} download={file}>
                 Download SVG <Download size={13} />
               </a>
             </div>
@@ -69,13 +69,13 @@ export default function Brand() {
       <div className="brand-downloads">
         <span>Need a transparent PNG?</span>
         <a
-          href={asset("/brand/guardianwaf-mark.png")}
+          href={brandAsset("/brand/guardianwaf-mark.png")}
           download="guardianwaf-mark.png"
         >
           Shield · 512 px <Download size={13} />
         </a>
         <a
-          href={asset("/brand/guardianwaf-stacked.png")}
+          href={brandAsset("/brand/guardianwaf-stacked.png")}
           download="guardianwaf-stacked.png"
         >
           Stacked logo · 1200 px <Download size={13} />

@@ -1,4 +1,6 @@
 import { useId, type SVGProps } from "react";
+import Image from "next/image";
+import { brandAsset } from "@/lib/site";
 import { shieldGradients, shieldLayers } from "@/lib/brand-shapes.mjs";
 
 export function Github(props: SVGProps<SVGSVGElement> & { size?: number }) {
@@ -54,6 +56,31 @@ export function LogoMark(props: SVGProps<SVGSVGElement>) {
     <svg viewBox="0 0 100 120" fill="none" aria-hidden="true" {...props}>
       <ShieldGlyph />
     </svg>
+  );
+}
+
+export function Wordmark({ className = "" }: { className?: string }) {
+  return (
+    <span
+      className={`brand-wordmark ${className}`}
+      role="img"
+      aria-label="GuardianWAF"
+    >
+      <Image
+        src={brandAsset("/brand/guardianwaf-logo-light.svg")}
+        width={269}
+        height={48}
+        alt=""
+        className="brand-wordmark-light"
+      />
+      <Image
+        src={brandAsset("/brand/guardianwaf-logo-dark.svg")}
+        width={269}
+        height={48}
+        alt=""
+        className="brand-wordmark-dark"
+      />
+    </span>
   );
 }
 

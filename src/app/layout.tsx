@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Header, Footer } from "@/components/chrome";
-import { asset, siteUrl } from "@/lib/site";
+import { brandAsset, siteUrl } from "@/lib/site";
 import { themeScript } from "@/lib/theme";
 import "./globals.css";
 
@@ -24,7 +24,10 @@ export const metadata: Metadata = {
   description:
     "An open-source web application firewall built in pure Go. Zero external Go dependencies, 11 attack detectors, three deployment modes. Your infrastructure, protected.",
   applicationName: "GuardianWAF",
-  icons: { icon: asset("/favicon.svg"), apple: asset("/apple-touch-icon.png") },
+  icons: {
+    icon: brandAsset("/favicon.svg"),
+    apple: brandAsset("/apple-touch-icon.png"),
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -34,7 +37,7 @@ export const metadata: Metadata = {
       "Open-source web application protection. Pure Go. One binary. Zero dependencies.",
     images: [
       {
-        url: asset("/social-card.png"),
+        url: brandAsset("/social-card.png"),
         width: 1200,
         height: 630,
         alt: "GuardianWAF — Zero dependencies. One binary. Your guardian.",
@@ -44,7 +47,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "GuardianWAF — Your traffic. Your rules. Your guardian.",
-    images: [asset("/social-card.png")],
+    images: [brandAsset("/social-card.png")],
   },
 };
 export const viewport: Viewport = {

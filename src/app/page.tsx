@@ -18,7 +18,7 @@ import {
   Terminal,
   Zap,
 } from "lucide-react";
-import { ShieldArt, LogoMark, Github } from "@/components/brand";
+import { ShieldArt, LogoMark, Github, Wordmark } from "@/components/brand";
 import {
   CopyButton,
   DeploymentTabs,
@@ -457,7 +457,7 @@ export default function Home() {
           <Reveal className="dashboard-preview">
             <div className="dashboard-top">
               <span>
-                <LogoMark /> GuardianWAF{" "}
+                <Wordmark className="dashboard-wordmark" />{" "}
                 <span className="dashboard-separator">/</span> Overview
               </span>
               <span className="dashboard-live">

@@ -1,4 +1,5 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import * as fontkit from "fontkit";
@@ -116,6 +117,30 @@ await writeFile(path.join(brandDir, "social-card.svg"), social);
 await sharp(Buffer.from(social))
   .png()
   .toFile(path.join(root, "public/social-card.png"));
+const assetVersions = {};
+for (const file of [
+  "brand/guardianwaf-logo-dark.svg",
+  "brand/guardianwaf-logo-light.svg",
+  "brand/guardianwaf-mark-dark.svg",
+  "brand/guardianwaf-mark-light.svg",
+  "brand/guardianwaf-stacked-dark.svg",
+  "brand/guardianwaf-stacked-light.svg",
+  "brand/guardianwaf-mark.png",
+  "brand/guardianwaf-stacked.png",
+  "brand/social-card.svg",
+  "favicon.svg",
+  "apple-touch-icon.png",
+  "social-card.png",
+]) {
+  assetVersions[`/${file}`] = createHash("sha256")
+    .update(await readFile(path.join(root, "public", file)))
+    .digest("hex")
+    .slice(0, 12);
+}
+await writeFile(
+  path.join(root, "src/lib/brand-versions.json"),
+  JSON.stringify(assetVersions, null, 2) + "\n",
+);
 console.log(
   "Generated six outlined SVG logos, two transparent PNGs, favicon, touch icon, and social card.",
 );

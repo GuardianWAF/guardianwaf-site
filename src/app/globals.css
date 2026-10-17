@@ -225,14 +225,26 @@ code,
   font-size: 25px;
   font-weight: 700;
 }
-.wordmark svg {
-  width: 28px;
-  height: 33px;
-  color: var(--accent);
+.brand-wordmark {
+  display: inline-block;
+  width: 190px;
+  flex-shrink: 0;
+  vertical-align: middle;
 }
-.wordmark-waf {
-  font-weight: 700;
-  color: var(--accent);
+.brand-wordmark img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+:root .brand-wordmark-light,
+:root[data-theme="light"] .brand-wordmark-dark {
+  display: none;
+}
+:root[data-theme="light"] .brand-wordmark-light {
+  display: block;
+}
+.brand-wordmark.dashboard-wordmark {
+  width: 96px;
 }
 .desktop-nav {
   display: flex;
@@ -459,6 +471,9 @@ code,
   }
 }
 @media (max-width: 600px) {
+  .site-header .brand-wordmark {
+    width: 165px;
+  }
   .theme-trigger {
     padding: 8px;
     gap: 4px;
@@ -1809,10 +1824,6 @@ code,
 .footer-main .wordmark {
   font-size: 22px;
 }
-.footer-main .wordmark svg {
-  width: 23px;
-  height: 27px;
-}
 .footer-main p {
   font-size: 10px;
   margin-top: 10px;
@@ -1834,8 +1845,10 @@ code,
   color: var(--subtle);
 }
 .tiny-shield {
-  color: var(--accent);
-  padding-left: 7px;
+  width: 12px;
+  height: 15px;
+  margin-left: 7px;
+  vertical-align: middle;
 }
 .studio-signature {
   --studio-pink: #ed0878;
@@ -2226,10 +2239,6 @@ code,
   color: #172f4c;
   --background: #f5f8fd;
 }
-.brand-preview svg {
-  width: 65px;
-  height: 75px;
-}
 .brand-preview img {
   display: block;
   max-width: 100%;
@@ -2246,15 +2255,6 @@ code,
 .brand-stacked-image {
   width: 190px;
   height: 190px;
-}
-.brand-preview .brand-name {
-  font-size: 40px;
-  letter-spacing: -2px;
-  font-weight: 650;
-  color: inherit;
-}
-.brand-preview .brand-name span {
-  font-weight: 400;
 }
 .brand-card-footer {
   border-top: 1px solid var(--border);
@@ -2563,9 +2563,6 @@ code,
     gap: 40px;
     grid-template-columns: 180px 1fr;
   }
-  .brand-preview .brand-name {
-    font-size: 30px;
-  }
 }
 @media (max-width: 800px) {
   .container {
@@ -2579,10 +2576,6 @@ code,
   }
   .wordmark {
     font-size: 23px;
-  }
-  .wordmark svg {
-    width: 25px;
-    height: 29px;
   }
   .desktop-nav {
     gap: 17px;
@@ -2923,13 +2916,6 @@ code,
     padding: 22px;
     height: 210px;
     gap: 12px;
-  }
-  .brand-preview svg {
-    width: 46px;
-    height: 53px;
-  }
-  .brand-preview .brand-name {
-    font-size: 26px;
   }
   .brand-grid {
     gap: 14px;
@@ -3562,13 +3548,6 @@ code,
   .brand-preview {
     height: 220px;
   }
-  .brand-preview .brand-name {
-    font-size: 36px;
-  }
-  .brand-preview svg {
-    width: 54px;
-    height: 62px;
-  }
   .brand-palette {
     grid-template-columns: 1fr 1fr;
     gap: 12px;
@@ -3626,12 +3605,12 @@ code,
   }
 }
 @media (max-width: 360px) {
+  .site-header .brand-wordmark {
+    width: 130px;
+  }
   .site-header .wordmark {
     font-size: 18px;
     gap: 6px;
-  }
-  .site-header .wordmark svg {
-    width: 23px;
   }
   .nav-actions {
     gap: 3px;

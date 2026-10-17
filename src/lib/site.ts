@@ -1,6 +1,13 @@
+import brandVersions from "./brand-versions.json";
+
 export const REPO = "https://github.com/GuardianWAF/GuardianWAF";
 export const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 export const asset = (path: string) => `${BASE}${path}`;
+export function brandAsset(path: string) {
+  const version = brandVersions[path as keyof typeof brandVersions];
+  if (!version) throw new Error(`Unknown brand asset: ${path}`);
+  return `${asset(path)}?v=${version}`;
+}
 export const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "https://guardianwaf.com";
 

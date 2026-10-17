@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRight, ArrowUpRight, Menu, X } from "lucide-react";
-import { Github, LogoMark } from "./brand";
+import { Github, LogoMark, Wordmark } from "./brand";
 import { REPO } from "@/lib/site";
 import { StudioSignature } from "./studio-signature";
 import { ThemeMenu } from "./theme-menu";
@@ -23,10 +23,7 @@ export function Header() {
     <header className="site-header">
       <div className="nav-wrap">
         <Link href="/" className="wordmark" aria-label="GuardianWAF home">
-          <LogoMark />
-          <span>
-            Guardian<span className="wordmark-waf">WAF</span>
-          </span>
+          <Wordmark />
         </Link>
         <nav className="desktop-nav" aria-label="Main navigation">
           <Link href="/#features">Features</Link>
@@ -90,10 +87,7 @@ export function Footer() {
       <div className="footer-main">
         <div>
           <Link href="/" className="wordmark">
-            <LogoMark />
-            <span>
-              Guardian<span className="wordmark-waf">WAF</span>
-            </span>
+            <Wordmark />
           </Link>
           <p>A little binary. A lot of peace of mind.</p>
         </div>
@@ -118,8 +112,7 @@ export function Footer() {
           © {new Date().getFullYear()} GuardianWAF. Open source under MIT.
         </span>
         <span>
-          Built with Go. Made for everyone.{" "}
-          <span className="tiny-shield">◇</span>
+          Built with Go. Made for everyone. <LogoMark className="tiny-shield" />
         </span>
       </div>
     </footer>

@@ -4,6 +4,7 @@ import { readFile, stat } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { createHash } from "node:crypto";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const out = path.join(root, "out");
@@ -125,6 +126,48 @@ test("SVG downloads are self-contained, outlined, and delivered as SVG", async (
     assert.doesNotMatch(
       svg,
       /<text|<image|<script|https?:\/\/(?!www\.w3\.org)/,
+    );
+  }
+});
+
+test("brand references include the actual asset version across every page", async () => {
+  const versions = JSON.parse(
+    await readFile(path.join(root, "src/lib/brand-versions.json"), "utf8"),
+  );
+  for (const [file, version] of Object.entries(versions)) {
+    const bytes = await readFile(path.join(out, file.slice(1)));
+    assert.equal(
+      createHash("sha256").update(bytes).digest("hex").slice(0, 12),
+      version,
+      file,
+    );
+  }
+  for (const page of pages) {
+    const html = await readFile(path.join(out, page), "utf8");
+    for (const match of html.matchAll(/(?:href|src|content)="([^"<>]+)"/g)) {
+      const url = new URL(
+        match[1].replaceAll("&amp;", "&"),
+        "https://guardianwaf.com",
+      );
+      const assetPath = url.pathname.slice(base.length);
+      if (versions[assetPath])
+        assert.equal(
+          url.searchParams.get("v"),
+          versions[assetPath],
+          `${page}: ${assetPath}`,
+        );
+    }
+    assert.ok(
+      html.includes(
+        `guardianwaf-logo-light.svg?v=${versions["/brand/guardianwaf-logo-light.svg"]}`,
+      ),
+      page,
+    );
+    assert.ok(
+      html.includes(
+        `guardianwaf-logo-dark.svg?v=${versions["/brand/guardianwaf-logo-dark.svg"]}`,
+      ),
+      page,
     );
   }
 });
