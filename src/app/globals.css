@@ -1730,7 +1730,8 @@ code,
   font-weight: 500;
 }
 .studio-explore:hover {
-  color: var(--studio-pink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 .studio-projects {
   display: grid;
