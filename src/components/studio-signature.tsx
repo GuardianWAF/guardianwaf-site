@@ -1,3 +1,7 @@
+"use client";
+
+import { useRef } from "react";
+import { useInView, useReducedMotion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 
 const projects = [
@@ -16,10 +20,19 @@ const projects = [
 ];
 
 export function StudioSignature() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const inView = useInView(sectionRef, {
+    once: true,
+    margin: "0px 0px -80px 0px",
+  });
+  const reducedMotion = useReducedMotion();
+
   return (
     <section
+      ref={sectionRef}
       id="studio"
       className="studio-signature"
+      data-logo-state={reducedMotion ? "static" : inView ? "draw" : "waiting"}
       aria-labelledby="studio-title"
     >
       <a

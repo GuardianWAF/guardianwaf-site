@@ -65,7 +65,7 @@ export default function RootLayout({
       </head>
       <body className={`${geist.variable} ${mono.variable}`}>
         <noscript>
-          <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important}.studio-symbol path{stroke-dasharray:none!important;stroke-dashoffset:0!important}`}</style>
         </noscript>
         <a href="#main" className="skip-link">
           Skip to content

@@ -1668,10 +1668,30 @@ code,
 .studio-symbol svg {
   display: block;
   width: 100%;
-  transition: transform 0.35s ease;
 }
-.studio-symbol:hover svg {
-  transform: rotate(-4deg) scale(1.04);
+.studio-signature:not([data-logo-state="static"]) .studio-symbol path {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+}
+.studio-signature[data-logo-state="draw"] .studio-symbol path {
+  animation: studio-logo-draw 1.6s cubic-bezier(0.6, 0.1, 0.2, 1) both;
+}
+.studio-signature[data-logo-state="draw"] .studio-symbol path:nth-child(2) {
+  animation-delay: 0.25s;
+}
+.studio-signature[data-logo-state="draw"] .studio-symbol path:nth-child(3) {
+  animation-delay: 0.5s;
+}
+.studio-signature[data-logo-state="draw"] .studio-symbol path:nth-child(4) {
+  animation-delay: 0.9s;
+}
+@keyframes studio-logo-draw {
+  from {
+    stroke-dashoffset: 400;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 .studio-copy {
   min-width: 0;
@@ -3397,5 +3417,9 @@ code,
   }
   .traffic-packets {
     display: none;
+  }
+  .studio-signature[data-logo-state] .studio-symbol path {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
   }
 }
