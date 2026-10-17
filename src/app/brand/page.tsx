@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Download } from "lucide-react";
-import { LogoMark } from "@/components/brand";
+import Image from "next/image";
 import { asset, siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -17,8 +17,8 @@ export default function Brand() {
       </span>
       <h1>A mark of protection.</h1>
       <p className="docs-lead">
-        A shield, an open gate, and a guardian at the center. Simple enough for
-        a favicon. Distinct enough to stand on its own.
+        Layers of blue protection, a deep navy core, and a terminal prompt at
+        the center. A guardian built for the people who build the web.
       </p>
       <div className="brand-grid">
         {[
@@ -30,15 +30,32 @@ export default function Brand() {
             "Logomark · light backgrounds",
             "guardianwaf-mark-light.svg",
           ],
+          [
+            "dark",
+            "Stacked logo · dark backgrounds",
+            "guardianwaf-stacked-dark.svg",
+          ],
+          [
+            "light",
+            "Stacked logo · light backgrounds",
+            "guardianwaf-stacked-light.svg",
+          ],
         ].map(([mode, name, file], i) => (
           <div className="brand-card" key={file}>
             <div className={`brand-preview brand-preview-${mode}`}>
-              <LogoMark />
-              {i < 2 && (
-                <span className="brand-name">
-                  guardian<span>waf.</span>
-                </span>
-              )}
+              <Image
+                src={asset(`/brand/${file}`)}
+                alt={`GuardianWAF ${i < 2 || i > 3 ? "logo" : "shield"} for ${mode} backgrounds`}
+                width={i < 2 ? 269 : i > 3 ? 190 : 75}
+                height={i < 2 ? 48 : i > 3 ? 190 : 90}
+                className={
+                  i < 2
+                    ? "brand-logo-image"
+                    : i > 3
+                      ? "brand-stacked-image"
+                      : "brand-mark-image"
+                }
+              />
             </div>
             <div className="brand-card-footer">
               <span>{name}</span>
@@ -49,12 +66,27 @@ export default function Brand() {
           </div>
         ))}
       </div>
+      <div className="brand-downloads">
+        <span>Need a transparent PNG?</span>
+        <a
+          href={asset("/brand/guardianwaf-mark.png")}
+          download="guardianwaf-mark.png"
+        >
+          Shield · 512 px <Download size={13} />
+        </a>
+        <a
+          href={asset("/brand/guardianwaf-stacked.png")}
+          download="guardianwaf-stacked.png"
+        >
+          Stacked logo · 1200 px <Download size={13} />
+        </a>
+      </div>
       <div className="brand-palette">
         {[
-          ["Guardian green", "#B6EB8B"],
-          ["Forest", "#101411"],
-          ["Warm white", "#F6F7F2"],
-          ["Evergreen", "#417B2E"],
+          ["Guardian blue", "#307FE9"],
+          ["Sky", "#88C2FF"],
+          ["Navy", "#172F4C"],
+          ["Cloud", "#F5F8FD"],
         ].map(([name, color]) => (
           <div className="brand-swatch" key={color}>
             <div style={{ background: color }} />

@@ -1,4 +1,5 @@
-import type { SVGProps } from "react";
+import { useId, type SVGProps } from "react";
+import { shieldGradients, shieldLayers } from "@/lib/brand-shapes.mjs";
 
 export function Github(props: SVGProps<SVGSVGElement> & { size?: number }) {
   const { size = 18, ...rest } = props;
@@ -16,23 +17,42 @@ export function Github(props: SVGProps<SVGSVGElement> & { size?: number }) {
   );
 }
 
+function ShieldGlyph() {
+  const id = useId();
+  return (
+    <>
+      <defs>
+        {shieldGradients.map(({ name, from, to }) => (
+          <linearGradient
+            key={name}
+            id={`${id}-${name}`}
+            x1="10"
+            y1="10"
+            x2="90"
+            y2="110"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stopColor={from} />
+            <stop offset="1" stopColor={to} />
+          </linearGradient>
+        ))}
+      </defs>
+      {shieldLayers.map(({ d, gradient, fill, opacity }, index) => (
+        <path
+          key={index}
+          d={d}
+          fill={gradient ? `url(#${id}-${gradient})` : fill}
+          opacity={opacity}
+        />
+      ))}
+    </>
+  );
+}
+
 export function LogoMark(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 40 44" fill="none" aria-hidden="true" {...props}>
-      <path
-        d="M20 2 37 9v12c0 10-7 17-17 21C10 38 3 31 3 21V9L20 2Z"
-        fill="currentColor"
-      />
-      <path
-        d="m20 10 10 4v8c0 5-4 10-10 13-6-3-10-8-10-13v-8l10-4Z"
-        fill="var(--background, #101411)"
-      />
-      <path
-        d="M20 15v13m-6-10v6m12-6v6"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="square"
-      />
+    <svg viewBox="0 0 100 120" fill="none" aria-hidden="true" {...props}>
+      <ShieldGlyph />
     </svg>
   );
 }
@@ -51,36 +71,9 @@ export function ShieldArt() {
         aria-hidden="true"
       >
         <defs>
-          <linearGradient
-            id="shield-shell"
-            x1="184"
-            y1="100"
-            x2="430"
-            y2="444"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stopColor="#91c88c" />
-            <stop offset=".35" stopColor="#285946" />
-            <stop offset="1" stopColor="#122d25" />
-          </linearGradient>
-          <linearGradient
-            id="shield-face"
-            x1="205"
-            y1="135"
-            x2="383"
-            y2="419"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stopColor="#274d3b" />
-            <stop offset="1" stopColor="#111e18" />
-          </linearGradient>
-          <linearGradient id="shield-edge" x1="190" y1="120" x2="400" y2="410">
-            <stop stopColor="#ccf8ac" />
-            <stop offset="1" stopColor="#3f8051" />
-          </linearGradient>
           <radialGradient id="shield-aura">
-            <stop stopColor="#9bdc66" stopOpacity=".17" />
-            <stop offset="1" stopColor="#9bdc66" stopOpacity="0" />
+            <stop stopColor="#307fe9" stopOpacity=".18" />
+            <stop offset="1" stopColor="#307fe9" stopOpacity="0" />
           </radialGradient>
           <pattern
             id="tiny-grid"
@@ -110,13 +103,13 @@ export function ShieldArt() {
           />
           <path d="M28 294h544M300 40v478" strokeDasharray="3 7" />
         </g>
-        <g className="traffic-path" stroke="#a6e979" strokeWidth="1.5">
+        <g className="traffic-path" stroke="#66aaff" strokeWidth="1.5">
           <path d="M35 177h80l55 55h50" />
           <path d="M32 353h78l60-60h55" />
           <path d="M390 259h53l50-50h78" />
           <path d="M384 317h70l45 45h62" />
         </g>
-        <g fill="#b9f58d" className="traffic-packets">
+        <g fill="#88c2ff" className="traffic-packets">
           <circle r="4">
             <animateMotion
               dur="4s"
@@ -142,54 +135,11 @@ export function ShieldArt() {
           </circle>
         </g>
         <g className="floating-shield">
-          <path
-            d="m300 102 121 50v112c0 85-53 144-121 181-68-37-121-96-121-181V152l121-50Z"
-            fill="#07120c"
-            stroke="#a9e583"
-            strokeOpacity=".15"
-            strokeWidth="17"
-          />
-          <path
-            d="m300 102 121 50v112c0 85-53 144-121 181-68-37-121-96-121-181V152l121-50Z"
-            fill="url(#shield-shell)"
-            stroke="url(#shield-edge)"
-            strokeWidth="2"
-          />
-          <path
-            d="m300 123 102 42v100c0 73-45 125-102 158-57-33-102-85-102-158V165l102-42Z"
-            fill="url(#shield-face)"
-            stroke="#84b376"
-            strokeOpacity=".65"
-          />
-          <path
-            d="m300 140 86 35v90c0 61-37 109-86 140-49-31-86-79-86-140v-90l86-35Z"
-            stroke="#b5ef92"
-            strokeOpacity=".14"
-            strokeDasharray="3 6"
-          />
-          <path
-            d="m300 181 59 25v58c0 43-25 78-59 102-34-24-59-59-59-102v-58l59-25Z"
-            fill="#b9ef8c"
-          />
-          <path
-            d="m300 199 44 18v48c0 32-19 58-44 78-25-20-44-46-44-78v-48l44-18Z"
-            fill="#183024"
-          />
-          <path
-            d="M300 224v73m-24-61v38m48-38v38"
-            stroke="#b9ef8c"
-            strokeWidth="12"
-          />
-          <path
-            d="m187 156 107-44"
-            stroke="#e2ffcd"
-            strokeWidth="2"
-            strokeLinecap="round"
-            opacity=".8"
-          />
-          <circle cx="300" cy="384" r="3" fill="#b9ef8c" />
+          <g transform="translate(150 98) scale(3)">
+            <ShieldGlyph />
+          </g>
         </g>
-        <g className="orbit-spark" fill="#c3f5a0">
+        <g className="orbit-spark" fill="#a9d4ff">
           <path d="m493 119 2 7 7 2-7 2-2 7-2-7-7-2 7-2 2-7Z" />
           <path d="m114 412 2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6Z" />
         </g>

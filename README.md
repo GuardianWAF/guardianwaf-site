@@ -59,7 +59,7 @@ The custom domain is `guardianwaf.com`; `public/CNAME` includes this value in ev
 
 ## Brand assets
 
-`/brand/` provides downloads of four self-contained SVGs: dark/light logotypes and dark/light logomarks. Wordmarks are outlined paths and do not depend on fonts. `public/brand/social-card.svg` is the editable source for `public/social-card.png`. The favicon and Apple touch icon use the same mark.
+`/brand/` provides six self-contained SVGs: horizontal logos, stacked logos and logomarks for dark/light backgrounds. The blue shield and white terminal prompt follow the supplied GuardianWAF identity. Wordmarks are outlined paths and do not depend on fonts. `src/lib/brand-shapes.mjs` is the shared vector source for the site, downloads, favicon, Apple touch icon and social card. Transparent PNGs are also available in `public/brand/`.
 
 To regenerate the committed assets:
 

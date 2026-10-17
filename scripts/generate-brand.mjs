@@ -3,13 +3,10 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import * as fontkit from "fontkit";
 import sharp from "sharp";
+import { brandColors, shieldMarkup } from "../src/lib/brand-shapes.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const font = fontkit.openSync(path.join(root, "scripts/fonts/Geist.ttf"));
-const markPath = "M20 2 37 9v12c0 10-7 17-17 21C10 38 3 31 3 21V9L20 2Z";
-function mark(color, cutout) {
-  return `<path d="${markPath}" fill="${color}"/><path d="m20 10 10 4v8c0 5-4 10-10 13-6-3-10-8-10-13v-8l10-4Z" fill="${cutout}"/><path d="M20 15v13m-6-10v6m12-6v6" stroke="${color}" stroke-width="3"/>`;
-}
 function textOutline(text, x, y, size, color, weight = 550) {
   const face = font.getVariation ? font.getVariation({ wght: weight }) : font;
   const run = face.layout(text);
@@ -27,35 +24,50 @@ function textOutline(text, x, y, size, color, weight = 550) {
 }
 const brandDir = path.join(root, "public/brand");
 await mkdir(brandDir, { recursive: true });
-for (const [mode, green, background, ink] of [
-  ["dark", "#b6eb8b", "#101411", "#f1f3e9"],
-  ["light", "#417b2e", "#f6f7f2", "#1d2c20"],
+for (const [mode, accent, ink] of [
+  ["dark", brandColors.sky, "#EDF4FF"],
+  ["light", brandColors.blue, brandColors.navy],
 ]) {
-  const logomark = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 44" fill="none" role="img" aria-label="GuardianWAF logomark"><title>GuardianWAF logomark</title>${mark(green, background)}</svg>`;
+  const logomark = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" fill="none" role="img" aria-label="GuardianWAF shield"><title>GuardianWAF shield</title>${shieldMarkup()}</svg>`;
   await writeFile(
     path.join(brandDir, `guardianwaf-mark-${mode}.svg`),
     logomark,
   );
-  const guardian = textOutline("guardian", 55, 34, 31, ink, 650);
-  const waf = textOutline("waf", 55 + guardian.width, 34, 31, ink, 400);
-  const dot = textOutline(
-    ".",
-    55 + guardian.width + waf.width,
-    34,
-    31,
-    green,
-    650,
+  const guardian = textOutline("Guardian", 55, 36, 31, ink, 760);
+  const waf = textOutline("WAF", 55 + guardian.width, 36, 31, accent, 760);
+  const width = Math.ceil(60 + guardian.width + waf.width);
+  const logo = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} 48" role="img" aria-label="GuardianWAF"><title>GuardianWAF</title><g transform="scale(.4)">${shieldMarkup()}</g>${guardian.paths}${waf.paths}</svg>`;
+  await writeFile(path.join(brandDir, `guardianwaf-logo-${mode}.svg`), logo);
+  const stackedGuardian = textOutline("Guardian", 0, 0, 76, ink, 760);
+  const stackedWaf = textOutline(
+    "WAF",
+    stackedGuardian.width,
+    0,
+    76,
+    accent,
+    760,
   );
-  const width = Math.ceil(60 + guardian.width + waf.width + dot.width);
+  const textWidth = stackedGuardian.width + stackedWaf.width;
+  const stacked = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="GuardianWAF stacked logo"><title>GuardianWAF</title><g transform="translate(150 40) scale(3)">${shieldMarkup()}</g><g transform="translate(${(600 - textWidth) / 2} 510)">${stackedGuardian.paths}${stackedWaf.paths}</g></svg>`;
   await writeFile(
-    path.join(brandDir, `guardianwaf-logo-${mode}.svg`),
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} 44" role="img" aria-label="GuardianWAF"><title>GuardianWAF</title><g>${mark(green, background)}</g>${guardian.paths}${waf.paths}${dot.paths}</svg>`,
+    path.join(brandDir, `guardianwaf-stacked-${mode}.svg`),
+    stacked,
   );
+  if (mode === "light") {
+    await sharp(Buffer.from(logomark))
+      .resize(512, 614)
+      .png()
+      .toFile(path.join(brandDir, "guardianwaf-mark.png"));
+    await sharp(Buffer.from(stacked))
+      .resize(1200, 1200)
+      .png()
+      .toFile(path.join(brandDir, "guardianwaf-stacked.png"));
+  }
 }
-const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#101411"/><g transform="translate(4 2)">${mark("#b6eb8b", "#101411")}</g></svg>`;
+const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120"><title>GuardianWAF</title>${shieldMarkup()}</svg>`;
 await writeFile(path.join(root, "public/favicon.svg"), favicon);
-await sharp(Buffer.from(favicon))
-  .resize(180, 180)
+const touchIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180"><rect width="180" height="180" rx="36" fill="${brandColors.night}"/><g transform="translate(35 24) scale(1.1)">${shieldMarkup()}</g></svg>`;
+await sharp(Buffer.from(touchIcon))
   .png()
   .toFile(path.join(root, "public/apple-touch-icon.png"));
 const headline = textOutline(
@@ -63,17 +75,32 @@ const headline = textOutline(
   80,
   295,
   76,
-  "#f1f3e9",
+  "#EDF4FF",
   500,
 );
-const subhead = textOutline("Your guardian.", 80, 389, 83, "#b6eb8b", 500);
-const brand = textOutline("guardianwaf.", 131, 114, 31, "#f1f3e9", 600);
+const subhead = textOutline(
+  "Your guardian.",
+  80,
+  389,
+  83,
+  brandColors.sky,
+  500,
+);
+const guardian = textOutline("Guardian", 131, 114, 31, "#EDF4FF", 760);
+const waf = textOutline(
+  "WAF",
+  131 + guardian.width,
+  114,
+  31,
+  brandColors.sky,
+  760,
+);
 const caption = textOutline(
   "Pure Go. Zero dependencies. One binary.",
   83,
   486,
   25,
-  "#a0a89e",
+  "#A3B4CC",
   400,
 );
 const footer = textOutline(
@@ -81,14 +108,14 @@ const footer = textOutline(
   83,
   565,
   14,
-  "#a0a89e",
+  "#A3B4CC",
   500,
 );
-const social = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><defs><radialGradient id="glow"><stop stop-color="#b6eb8b" stop-opacity=".13"/><stop offset="1" stop-color="#b6eb8b" stop-opacity="0"/></radialGradient><pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0v42" stroke="#b6eb8b" stroke-opacity=".045" fill="none"/></pattern></defs><path fill="#101411" d="M0 0h1200v630H0z"/><path fill="url(#grid)" d="M0 0h1200v630H0z"/><ellipse cx="1000" cy="300" rx="350" ry="340" fill="url(#glow)"/><g transform="translate(82 80) scale(.85)">${mark("#b6eb8b", "#101411")}</g>${brand.paths}${headline.paths}${subhead.paths}${caption.paths}${footer.paths}<path d="M82 530h1036" stroke="#2b3329"/><g transform="translate(950 228) scale(4)">${mark("#b6eb8b", "#101411")}</g></svg>`;
+const social = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><defs><radialGradient id="glow"><stop stop-color="${brandColors.blue}" stop-opacity=".2"/><stop offset="1" stop-color="${brandColors.blue}" stop-opacity="0"/></radialGradient><pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0v42" stroke="${brandColors.sky}" stroke-opacity=".06" fill="none"/></pattern></defs><path fill="${brandColors.night}" d="M0 0h1200v630H0z"/><path fill="url(#grid)" d="M0 0h1200v630H0z"/><ellipse cx="1000" cy="300" rx="350" ry="340" fill="url(#glow)"/><g transform="translate(82 78) scale(.36)">${shieldMarkup("header")}</g>${guardian.paths}${waf.paths}${headline.paths}${subhead.paths}${caption.paths}${footer.paths}<path d="M82 530h1036" stroke="#2A3B55"/><g transform="translate(930 187) scale(2)">${shieldMarkup("hero")}</g></svg>`;
 await writeFile(path.join(brandDir, "social-card.svg"), social);
 await sharp(Buffer.from(social))
   .png()
   .toFile(path.join(root, "public/social-card.png"));
 console.log(
-  "Generated four outlined SVG logos, favicon, touch icon, and social card.",
+  "Generated six outlined SVG logos, two transparent PNGs, favicon, touch icon, and social card.",
 );

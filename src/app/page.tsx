@@ -508,8 +508,12 @@ export default function Home() {
               >
                 <defs>
                   <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
-                    <stop stopColor="#b1e789" stopOpacity=".28" />
-                    <stop offset="1" stopColor="#b1e789" stopOpacity="0" />
+                    <stop stopColor="var(--accent)" stopOpacity=".28" />
+                    <stop
+                      offset="1"
+                      stopColor="var(--accent)"
+                      stopOpacity="0"
+                    />
                   </linearGradient>
                 </defs>
                 <path
@@ -519,7 +523,7 @@ export default function Home() {
                 <path
                   className="chart-line"
                   d="M0 126 18 119 35 124 52 97 69 108 86 92 103 99 120 71 138 83 155 67 172 83 189 72 206 101 224 78 241 83 258 59 276 70 292 43 310 64 327 49 344 69 361 47 379 56 396 31 413 45 430 25 448 44 465 31 482 47 499 20 516 34 534 15 551 28 568 12 585 25 603 9 620 18"
-                  stroke="#b1e789"
+                  stroke="var(--accent)"
                   strokeWidth="2"
                   fill="none"
                 />

@@ -111,6 +111,8 @@ test("SVG downloads are self-contained, outlined, and delivered as SVG", async (
     "logo-light",
     "mark-dark",
     "mark-light",
+    "stacked-dark",
+    "stacked-light",
   ]) {
     const response = await fetch(
       `${origin}${base}/brand/guardianwaf-${variant}.svg`,
@@ -138,6 +140,8 @@ test("social images, discovery metadata, and font licenses are included", async 
     "social-card.png",
     "apple-touch-icon.png",
     "favicon.svg",
+    "brand/guardianwaf-mark.png",
+    "brand/guardianwaf-stacked.png",
     "robots.txt",
     "sitemap.xml",
     "licenses/Geist-OFL.txt",

@@ -25,8 +25,7 @@ export function Header() {
         <Link href="/" className="wordmark" aria-label="GuardianWAF home">
           <LogoMark />
           <span>
-            guardian<span className="wordmark-waf">waf</span>
-            <span className="wordmark-period">.</span>
+            Guardian<span className="wordmark-waf">WAF</span>
           </span>
         </Link>
         <nav className="desktop-nav" aria-label="Main navigation">
@@ -93,8 +92,7 @@ export function Footer() {
           <Link href="/" className="wordmark">
             <LogoMark />
             <span>
-              guardian<span className="wordmark-waf">waf</span>
-              <span className="wordmark-period">.</span>
+              Guardian<span className="wordmark-waf">WAF</span>
             </span>
           </Link>
           <p>A little binary. A lot of peace of mind.</p>

@@ -1,15 +1,15 @@
 :root {
-  --background: #101411;
-  --surface: #161b16;
-  --surface-raised: #1c221b;
-  --foreground: #f1f3e9;
-  --muted: #a0a89e;
-  --subtle: #8b9587;
-  --accent: #b6eb8b;
-  --accent-ink: #152313;
-  --border: #2b3329;
-  --faint: #20281f;
-  --header: rgba(16, 20, 17, 0.9);
+  --background: #0b1220;
+  --surface: #111d30;
+  --surface-raised: #18263d;
+  --foreground: #edf4ff;
+  --muted: #a3b4cc;
+  --subtle: #8c9fb9;
+  --accent: #88c2ff;
+  --accent-ink: #0b2241;
+  --border: #2a3b55;
+  --faint: #1c2c45;
+  --header: rgba(11, 18, 32, 0.9);
   --red: #ff9b89;
   --amber: #ebcb84;
   color-scheme: dark;
@@ -19,17 +19,17 @@ body {
   --font-mono: var(--font-geist-mono), monospace;
 }
 :root[data-theme="light"] {
-  --background: #f6f7f2;
+  --background: #f5f8fd;
   --surface: #fff;
-  --surface-raised: #edf1e7;
-  --foreground: #1d2c20;
-  --muted: #586653;
-  --subtle: #697561;
-  --accent: #417b2e;
+  --surface-raised: #eaf1fb;
+  --foreground: #172f4c;
+  --muted: #526780;
+  --subtle: #60748c;
+  --accent: #2165c5;
   --accent-ink: #fff;
-  --border: #d8dfd1;
-  --faint: #e9eee3;
-  --header: rgba(246, 247, 242, 0.92);
+  --border: #d5dfec;
+  --faint: #e8eff9;
+  --header: rgba(245, 248, 253, 0.94);
   --red: #b83c2c;
   --amber: #8b650b;
   color-scheme: light;
@@ -231,9 +231,7 @@ code,
   color: var(--accent);
 }
 .wordmark-waf {
-  font-weight: 400;
-}
-.wordmark-period {
+  font-weight: 700;
   color: var(--accent);
 }
 .desktop-nav {
@@ -353,24 +351,24 @@ code,
   margin-bottom: 9px;
   border: 1px solid var(--border);
   border-radius: 9px;
-  background: #eef2e8;
-  --preview-line: #c3cdbb;
-  --preview-accent: #588140;
+  background: #eaf1fb;
+  --preview-line: #c0cee1;
+  --preview-accent: #307fe9;
   --preview-window: #fff;
-  --preview-border: #d3dcce;
+  --preview-border: #cbd8ea;
 }
 .theme-preview-dark {
-  background: #151d18;
-  --preview-line: #3b4a3d;
-  --preview-accent: #b6eb8b;
-  --preview-window: #1e2920;
-  --preview-border: #3b4a3d;
+  background: #0b1220;
+  --preview-line: #384b67;
+  --preview-accent: #88c2ff;
+  --preview-window: #172b46;
+  --preview-border: #384b67;
 }
 .theme-preview-system {
-  background: linear-gradient(115deg, #eef2e8 50%, #151d18 50%);
+  background: linear-gradient(115deg, #eaf1fb 50%, #0b1220 50%);
 }
 .theme-preview-system .theme-preview-window {
-  background: linear-gradient(115deg, #fff 39%, #1e2920 39%);
+  background: linear-gradient(115deg, #fff 39%, #172b46 39%);
 }
 .theme-preview-window {
   position: absolute;
@@ -416,10 +414,10 @@ code,
   border: 1px solid var(--preview-border);
   border-radius: 50%;
   background: var(--preview-window);
-  color: #6e8166;
+  color: #627c9b;
 }
 .theme-preview-dark .theme-preview-icon {
-  color: #a8bca0;
+  color: #9db8db;
 }
 .theme-option[aria-checked="true"] .theme-preview {
   border-color: var(--accent);
@@ -575,7 +573,7 @@ code,
   border: 1px solid var(--accent);
 }
 .button-primary:hover {
-  background: color-mix(in srgb, var(--accent) 86%, #fff);
+  background: color-mix(in srgb, var(--accent) 90%, var(--foreground));
 }
 .button-secondary {
   background: transparent;
@@ -2219,18 +2217,35 @@ code,
   padding: 35px;
 }
 .brand-preview-dark {
-  background: #101411;
-  color: #b6eb8b;
-  --background: #101411;
+  background: #0b1220;
+  color: #edf4ff;
+  --background: #0b1220;
 }
 .brand-preview-light {
-  background: #f6f7f2;
-  color: #417b2e;
-  --background: #f6f7f2;
+  background: #f5f8fd;
+  color: #172f4c;
+  --background: #f5f8fd;
 }
 .brand-preview svg {
   width: 65px;
   height: 75px;
+}
+.brand-preview img {
+  display: block;
+  max-width: 100%;
+  object-fit: contain;
+}
+.brand-logo-image {
+  width: 320px;
+  height: auto;
+}
+.brand-mark-image {
+  width: 75px;
+  height: 90px;
+}
+.brand-stacked-image {
+  width: 190px;
+  height: 190px;
 }
 .brand-preview .brand-name {
   font-size: 40px;
@@ -2261,6 +2276,25 @@ code,
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-top: 40px;
+}
+.brand-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+  padding-top: 24px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.brand-downloads a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent);
+}
+.brand-downloads a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 .brand-swatch {
   border: 1px solid var(--border);
