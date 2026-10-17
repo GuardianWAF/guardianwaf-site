@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { ArrowUpRight, Download, ShieldCheck } from "lucide-react";
 import { CopyButton } from "@/components/interactions";
 import { deployments, REPO, siteUrl } from "@/lib/site";
@@ -50,6 +51,28 @@ function Code({ code, file }: { code: string; file: string }) {
   );
 }
 
+function ExampleSection({
+  id,
+  title,
+  examples,
+  children,
+}: {
+  id: string;
+  title: string;
+  examples: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section id={id} className="content-split">
+      <div className="content-split-copy">
+        <h2>{title}</h2>
+        {children}
+      </div>
+      <div className="content-split-panel">{examples}</div>
+    </section>
+  );
+}
+
 export default function Docs() {
   return (
     <main id="main" className="container docs-layout">
@@ -74,22 +97,34 @@ export default function Docs() {
         </nav>
       </aside>
       <article className="docs-content">
-        <span className="eyebrow" id="overview">
-          <span /> HELLO, GUARDIAN
-        </span>
-        <h1>Protection starts here.</h1>
-        <p className="docs-lead">
-          From your first request to your entire stack. Get GuardianWAF running
-          in the way that fits your application.
-        </p>
-        <div className="docs-callout">
-          <strong>One engine, three ways to deploy.</strong> Use Docker to
-          protect any reachable HTTP service, embed the middleware in a Go
-          application, or run the standalone reverse proxy. Examples below
-          follow the official project documentation.
+        <div className="docs-intro">
+          <span className="eyebrow" id="overview">
+            <span /> HELLO, GUARDIAN
+          </span>
+          <h1>Protection starts here.</h1>
+          <p className="docs-lead">
+            From your first request to your entire stack. Get GuardianWAF
+            running in the way that fits your application.
+          </p>
+          <div className="docs-callout">
+            <strong>One engine, three ways to deploy.</strong> Use Docker to
+            protect any reachable HTTP service, embed the middleware in a Go
+            application, or run the standalone reverse proxy. Examples below
+            follow the official project documentation.
+          </div>
         </div>
-        <section id="installation">
-          <h2>01. Pick your installation</h2>
+        <ExampleSection
+          id="installation"
+          title="01. Pick your installation"
+          examples={
+            <>
+              <Code
+                file="terminal · install with Go"
+                code="go install github.com/guardianwaf/guardianwaf/cmd/guardianwaf@latest"
+              />
+            </>
+          }
+        >
           <p>
             Download a prebuilt binary for your platform, use the official
             container image, or install using a compatible Go toolchain. Check
@@ -113,10 +148,7 @@ export default function Docs() {
             <Download size={16} /> Download the latest release{" "}
             <ArrowUpRight size={13} />
           </a>
-          <Code
-            file="terminal · install with Go"
-            code="go install github.com/guardianwaf/guardianwaf/cmd/guardianwaf@latest"
-          />
+
           <p>
             The source build includes a dashboard asset step; use the{" "}
             <a
@@ -129,16 +161,15 @@ export default function Docs() {
             </a>{" "}
             if you are building a release yourself.
           </p>
-        </section>
-        <section id="docker">
-          <h2>02. Docker sidecar</h2>
-          <p>
-            The quickest way to protect an existing application. This example
-            creates a demo backend and the WAF on a shared Docker network.
-          </p>
-          <Code
-            file="terminal"
-            code={`docker network create guardian-demo
+        </ExampleSection>
+        <ExampleSection
+          id="docker"
+          title="02. Docker sidecar"
+          examples={
+            <>
+              <Code
+                file="terminal"
+                code={`docker network create guardian-demo
 docker run -d --name app --network guardian-demo nginx:alpine
 docker run -d --name guardianwaf --network guardian-demo \\
   -p 8088:8088 \\
@@ -146,7 +177,15 @@ docker run -d --name guardianwaf --network guardian-demo \\
   sidecar --upstream http://app:80
 
 curl -i http://localhost:8088`}
-          />
+              />
+            </>
+          }
+        >
+          <p>
+            The quickest way to protect an existing application. This example
+            creates a demo backend and the WAF on a shared Docker network.
+          </p>
+
           <p>
             For your application, replace{" "}
             <code className="inline-code">http://app:80</code> with its
@@ -162,43 +201,60 @@ curl -i http://localhost:8088`}
           >
             Docker auto-discovery guide <ArrowUpRight size={14} />
           </a>
-        </section>
-        <section id="go">
-          <h2>03. Go middleware</h2>
+        </ExampleSection>
+        <ExampleSection
+          id="go"
+          title="03. Go middleware"
+          examples={
+            <>
+              <Code
+                file="terminal"
+                code="go get github.com/guardianwaf/guardianwaf"
+              />
+              <Code file="main.go" code={goExample} />
+            </>
+          }
+        >
           <p>
             Wrap a standard <code className="inline-code">net/http</code>{" "}
             handler. The engine runs inside your application, with no external
             Go module dependencies.
           </p>
-          <Code
-            file="terminal"
-            code="go get github.com/guardianwaf/guardianwaf"
-          />
-          <Code file="main.go" code={goExample} />
+
           <p>
             Start your application and send a request to{" "}
             <code className="inline-code">http://localhost:8088</code>. Use
             thresholds, exclusions, and event callbacks to adapt protection to
             your own traffic.
           </p>
-        </section>
-        <section id="binary">
-          <h2>04. Standalone reverse proxy</h2>
+        </ExampleSection>
+        <ExampleSection
+          id="binary"
+          title="04. Standalone reverse proxy"
+          examples={
+            <>
+              <Code file="guardianwaf.yaml" code={deployments[2].code} />
+              <Code
+                file="terminal"
+                code="guardianwaf serve -c guardianwaf.yaml"
+              />
+            </>
+          }
+        >
           <p>
             Install a binary, then save this file as{" "}
             <code className="inline-code">guardianwaf.yaml</code>. The proxy
             listens on port 8088 and forwards requests to a local app on port
             3000.
           </p>
-          <Code file="guardianwaf.yaml" code={deployments[2].code} />
-          <Code file="terminal" code="guardianwaf serve -c guardianwaf.yaml" />
+
           <div className="docs-callout">
             <strong>Start with your traffic in mind.</strong> These examples use
             enforce mode. To observe existing traffic before enforcing a policy,
             set <code className="inline-code">mode: monitor</code> and review
             the findings first.
           </div>
-        </section>
+        </ExampleSection>
         <section id="production">
           <h2>05. Before you go live</h2>
           <p>

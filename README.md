@@ -73,6 +73,8 @@ This optional generator uses the `fontkit` and `sharp` development dependencies.
 
 ## Content and interaction notes
 
+Layout uses shared CSS tokens in `src/app/globals.css`: a fluid gutter and a 1728px maximum shell align navigation, content and footer. Wide screens use four feature tracks and three brand/resource columns; documentation separates readable copy from code panels at 1280px. Text keeps a 68ch reading measure while visual panels can fill the shell. Responsive review targets 375, 768, 1024, 1440, 1920 and 2560px.
+
 - Product claims and quick-start examples are grounded in the upstream README, `go.mod`, and `docs/`. The supplied infographic is visual inspiration; its outdated detector/MCP counts are not copied.
 - The `<1ms` p99 value is explicitly described as the upstream performance **target**, not a benchmark performed by this website.
 - The request inspector is an illustration with fixed examples, not a real detection engine. Its scores and the dashboard preview are labeled as illustrative.
