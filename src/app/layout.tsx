@@ -4,6 +4,7 @@ import { Header, Footer } from "@/components/chrome";
 import { AnimatedBackground } from "@/components/animated-background";
 import { brandAsset, siteUrl } from "@/lib/site";
 import { themeScript } from "@/lib/theme";
+import { animationScript } from "@/lib/animation-preference";
 import "./globals.css";
 
 const geist = localFont({
@@ -65,6 +66,7 @@ export default function RootLayout({
     <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: animationScript }} />
       </head>
       <body className={`${geist.variable} ${mono.variable}`}>
         <AnimatedBackground />

@@ -28,7 +28,13 @@ const tracePath = (kind) =>
     ? "M-100-22H-64L-42 0H-20M20 0H54L76 24H110"
     : "M-90 24H-50L-26 0H-14M14 0H48L68-22H104";
 
-export function mountAmbientSvg(svg, uid, env = window, interactionSvg) {
+export function mountAmbientSvg(
+  svg,
+  uid,
+  env = window,
+  interactionSvg,
+  { respectReducedMotion = true } = {},
+) {
   if (!interactionSvg)
     throw new Error("An independent interaction SVG is required");
   const doc = svg.ownerDocument;
@@ -266,7 +272,7 @@ export function mountAmbientSvg(svg, uid, env = window, interactionSvg) {
     return { group, rings, halo, particles, relays, visible: false };
   });
   const media = env.matchMedia("(prefers-reduced-motion: reduce)");
-  let reduced = media.matches,
+  let reduced = respectReducedMotion && media.matches,
     inView = !env.IntersectionObserver;
   let scene = createField(1, 1),
     pool = [],
@@ -599,7 +605,7 @@ export function mountAmbientSvg(svg, uid, env = window, interactionSvg) {
   env.addEventListener("scroll", scroll, { passive: true });
   env.addEventListener("resize", resize, { passive: true });
   env.addEventListener("blur", leave);
-  media.addEventListener("change", preference);
+  if (respectReducedMotion) media.addEventListener("change", preference);
   sizeObserver.observe(svg);
   resize();
   intersection?.observe(svg);
@@ -613,7 +619,7 @@ export function mountAmbientSvg(svg, uid, env = window, interactionSvg) {
     env.removeEventListener("scroll", scroll);
     env.removeEventListener("resize", resize);
     env.removeEventListener("blur", leave);
-    media.removeEventListener("change", preference);
+    if (respectReducedMotion) media.removeEventListener("change", preference);
     sizeObserver.disconnect();
     intersection?.disconnect();
     svg.replaceChildren();

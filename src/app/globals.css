@@ -404,6 +404,59 @@ code,
 .theme-control {
   position: relative;
 }
+.animation-control {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.animation-toggle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--accent);
+  background: var(--faint);
+}
+.animation-toggle[aria-pressed="false"] {
+  color: var(--muted);
+  background: transparent;
+}
+.animation-toggle[aria-pressed="false"] svg,
+:root[data-animations="off"] .animation-toggle svg {
+  opacity: 0.5;
+}
+.animation-toggle:hover {
+  border-color: var(--accent);
+}
+.animation-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.animation-tooltip {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--foreground);
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  visibility: hidden;
+}
+.animation-control:hover .animation-tooltip,
+.animation-control:focus-within .animation-tooltip {
+  visibility: visible;
+}
+:root[data-animations="off"] .site-background,
+:root[data-animations="off"] .site-interactions {
+  display: none;
+}
 .theme-trigger {
   display: flex;
   align-items: center;
@@ -592,13 +645,16 @@ code,
 }
 @media (max-width: 600px) {
   .site-header .brand-wordmark {
-    width: 165px;
+    width: 130px;
   }
   .theme-trigger {
-    padding: 8px;
-    gap: 4px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
   }
-  .theme-trigger > span {
+  .theme-trigger > span,
+  .theme-trigger > svg:last-child {
     display: none;
   }
   .theme-panel {
@@ -3829,8 +3885,11 @@ code,
   }
 }
 @media (max-width: 360px) {
+  .site-header .github-nav {
+    display: none;
+  }
   .site-header .brand-wordmark {
-    width: 130px;
+    width: 120px;
   }
   .site-header .wordmark {
     font-size: 18px;
@@ -3854,7 +3913,7 @@ code,
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .site-interactions {
+  :root:not([data-animations="on"]) .site-interactions {
     display: none;
   }
   html {

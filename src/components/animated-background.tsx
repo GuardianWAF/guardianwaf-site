@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { mountAmbientSvg } from "@/lib/ambient-svg.mjs";
+import { mountAmbientController } from "@/lib/ambient-controller.mjs";
 
 export function AnimatedBackground() {
   const svg = useRef<SVGSVGElement>(null);
@@ -11,7 +11,12 @@ export function AnimatedBackground() {
   const pathname = usePathname();
   useEffect(() => {
     if (!svg.current || !interactions.current) return;
-    return mountAmbientSvg(svg.current, id, window, interactions.current);
+    return mountAmbientController(
+      svg.current,
+      id,
+      window,
+      interactions.current,
+    );
   }, [id, pathname]);
   return (
     <>

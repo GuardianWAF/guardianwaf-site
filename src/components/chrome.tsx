@@ -7,6 +7,7 @@ import { Github, LogoMark, Wordmark } from "./brand";
 import { REPO } from "@/lib/site";
 import { StudioSignature } from "./studio-signature";
 import { ThemeMenu } from "./theme-menu";
+import { AnimationToggle } from "./animation-toggle";
 
 export function Header() {
   const [menu, setMenu] = useState(false);
@@ -35,6 +36,7 @@ export function Header() {
         </nav>
         <div className="nav-actions">
           <ThemeMenu />
+          <AnimationToggle />
           <a
             className="github-nav"
             aria-label="GuardianWAF on GitHub"

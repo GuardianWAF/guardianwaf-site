@@ -11,6 +11,7 @@ import {
   advanceField,
 } from "../src/lib/ambient-field.mjs";
 import { mountAmbientSvg } from "../src/lib/ambient-svg.mjs";
+import { mountAmbientController } from "../src/lib/ambient-controller.mjs";
 
 test("mobile and 4K fields have bounded density, depth and edge-to-edge coverage", () => {
   const mobile = createField(375, 900),
@@ -158,7 +159,7 @@ class SvgNode {
 function nodes(root) {
   return [root, ...root.children.flatMap(nodes)];
 }
-function browser(reduced = false) {
+function browser(reduced = false, controlled = false) {
   let now = 0,
     id = 0,
     selection = "";
@@ -166,6 +167,7 @@ function browser(reduced = false) {
     observers = [];
   const doc = Object.assign(new Events(), {
     hidden: false,
+    documentElement: { dataset: { animations: reduced ? "off" : "on" } },
     body: {},
     querySelector: () => ({}),
     querySelectorAll: () => [],
@@ -201,10 +203,9 @@ function browser(reduced = false) {
     MutationObserver: class Mutation extends Observer {},
     IntersectionObserver: class Intersection extends Observer {},
   });
-  const cleanup = mountAmbientSvg(svg, "test", env, overlay);
-  const intersection = observers.find(
-    (observer) => observer.constructor.name === "Intersection",
-  );
+  const cleanup = controlled
+    ? mountAmbientController(svg, "test", env, overlay)
+    : mountAmbientSvg(svg, "test", env, overlay);
   const blank = { closest: () => null },
     control = { closest: () => ({}) };
   return {
@@ -218,6 +219,9 @@ function browser(reduced = false) {
     cleanup,
     control,
     visible(value) {
+      const intersection = observers.findLast(
+        (observer) => observer.constructor.name === "Intersection",
+      );
       intersection.callback([{ isIntersecting: value }]);
     },
     select(value) {
@@ -270,6 +274,65 @@ test("hidden objects skip SVG updates and long-page scrolling reuses the same no
   assert.ok(
     Number(page.svg.dataset.activeCount) < Number(page.svg.dataset.objectCount),
   );
+  page.cleanup();
+});
+
+test("animation Off disposes every renderer resource and On starts one fresh scene", () => {
+  const page = browser(false, true);
+  page.visible(true);
+  page.frame(0);
+  page.pointer("pointerdown");
+  page.pointer("pointerup");
+  page.frame(100);
+  assert.equal(page.svg.dataset.pulseCount, "1");
+  const count = nodes(page.svg).length + nodes(page.overlay).length;
+  page.doc.documentElement.dataset.animations = "off";
+  page.env.emit("guardian-animations-change");
+  assert.equal(page.pending.size, 0);
+  assert.equal(page.doc.count + page.media.count, 0);
+  assert.equal(page.env.count, 1, "only the preference subscription remains");
+  assert.ok(page.observers.every((o) => o.disconnected));
+  assert.equal(page.svg.children.length + page.overlay.children.length, 0);
+  assert.equal(page.overlay.dataset.sceneState, "disabled");
+  assert.equal(page.overlay.dataset.pulseCount, "0");
+  page.pointer("pointermove");
+  page.pointer("pointerdown");
+  page.pointer("pointerup");
+  page.frame(3000);
+  assert.equal(page.overlay.dataset.pulseCount, "0");
+  page.doc.documentElement.dataset.animations = "on";
+  page.env.emit("guardian-animations-change");
+  page.visible(true);
+  page.frame(3100);
+  assert.equal(page.pending.size, 1);
+  assert.equal(nodes(page.svg).length + nodes(page.overlay).length, count);
+  const observerCount = page.observers.length;
+  page.env.emit("guardian-animations-change");
+  assert.equal(page.observers.length, observerCount);
+  page.pointer("pointerdown");
+  page.pointer("pointerup");
+  page.frame(3200);
+  assert.equal(page.overlay.dataset.pulseCount, "1");
+  page.cleanup();
+  assert.equal(page.env.count + page.doc.count + page.media.count, 0);
+  assert.equal(page.pending.size, 0);
+});
+
+test("reduced-motion default does not mount a renderer; explicit On can restart it", () => {
+  const page = browser(true, true);
+  assert.equal(page.pending.size, 0);
+  assert.equal(page.observers.length, 0);
+  assert.equal(page.doc.count, 0);
+  assert.equal(page.svg.dataset.sceneState, "disabled");
+  page.doc.documentElement.dataset.animations = "on";
+  page.env.emit("guardian-animations-change");
+  page.visible(true);
+  page.frame(0);
+  assert.equal(page.svg.dataset.sceneState, "running");
+  page.pointer("pointerdown");
+  page.pointer("pointerup");
+  page.frame(100);
+  assert.equal(page.overlay.dataset.pulseCount, "1");
   page.cleanup();
 });
 

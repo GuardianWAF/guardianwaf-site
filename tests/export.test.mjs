@@ -88,6 +88,11 @@ test("every page includes separate decorative SVG layers and no retired hero can
       /<svg[^>]*class="site-interactions"[^>]*aria-hidden="true"[^>]*focusable="false"/,
     );
     assert.doesNotMatch(html, /<canvas\b/);
+    assert.match(
+      html,
+      /<button[^>]*class="animation-toggle"[^>]*aria-label="Animasyonları kapat"[^>]*aria-pressed="true"[^>]*title="Animasyonları kapat"/,
+    );
+    assert.match(html, /guardian-animations/);
   }
 });
 
