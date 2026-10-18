@@ -63,6 +63,8 @@ The custom domain is `guardianwaf.com`; `public/CNAME` includes this value in ev
 
 Header, footer and dashboard wordmarks use the same SVG files as the downloads. The generator records content hashes in `src/lib/brand-versions.json`; previews, downloads, icons and social metadata use these versions so updated artwork gets a fresh browser cache entry.
 
+The 1200×630 social preview is `public/og.png`, generated from `public/brand/social-card.svg` and used by Open Graph and Twitter metadata. `public/social-card.png` remains available at its original URL.
+
 To regenerate the committed assets:
 
 ```sh

@@ -37,7 +37,7 @@ export const metadata: Metadata = {
       "Open-source web application protection. Pure Go. One binary. Zero dependencies.",
     images: [
       {
-        url: brandAsset("/social-card.png"),
+        url: brandAsset("/og.png"),
         width: 1200,
         height: 630,
         alt: "GuardianWAF — Zero dependencies. One binary. Your guardian.",
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "GuardianWAF — Your traffic. Your rules. Your guardian.",
-    images: [brandAsset("/social-card.png")],
+    images: [brandAsset("/og.png")],
   },
 };
 export const viewport: Viewport = {

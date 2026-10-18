@@ -180,6 +180,7 @@ test("unknown routes return a genuine 404 with the branded recovery page", async
 
 test("social images, discovery metadata, and font licenses are included", async () => {
   for (const file of [
+    "og.png",
     "social-card.png",
     "apple-touch-icon.png",
     "favicon.svg",
@@ -201,6 +202,24 @@ test("social images, discovery metadata, and font licenses are included", async 
   assert.match(home, /property="og:image"/);
   assert.match(home, /rel="canonical"/);
   assert.match(home, /name="twitter:card" content="summary_large_image"/);
+  const og = await readFile(path.join(out, "og.png"));
+  assert.equal(og.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
+  assert.equal(og.readUInt32BE(16), 1200);
+  assert.equal(og.readUInt32BE(20), 630);
+  for (const page of pages) {
+    const html = await readFile(path.join(out, page), "utf8");
+    for (const tag of ["og:image", "twitter:image"]) {
+      const image = html.match(
+        new RegExp(`<meta (?:property|name)="${tag}" content="([^"]+)"`),
+      );
+      assert.ok(image, `${page}: missing ${tag}`);
+      assert.equal(
+        new URL(image[1]).pathname,
+        `${base}/og.png`,
+        `${page}: ${tag}`,
+      );
+    }
+  }
 });
 
 test("encoded traversal cannot expose workspace source", async () => {

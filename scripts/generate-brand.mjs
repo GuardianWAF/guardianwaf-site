@@ -114,9 +114,9 @@ const footer = textOutline(
 );
 const social = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><defs><radialGradient id="glow"><stop stop-color="${brandColors.blue}" stop-opacity=".2"/><stop offset="1" stop-color="${brandColors.blue}" stop-opacity="0"/></radialGradient><pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0v42" stroke="${brandColors.sky}" stroke-opacity=".06" fill="none"/></pattern></defs><path fill="${brandColors.night}" d="M0 0h1200v630H0z"/><path fill="url(#grid)" d="M0 0h1200v630H0z"/><ellipse cx="1000" cy="300" rx="350" ry="340" fill="url(#glow)"/><g transform="translate(82 78) scale(.36)">${shieldMarkup("header")}</g>${guardian.paths}${waf.paths}${headline.paths}${subhead.paths}${caption.paths}${footer.paths}<path d="M82 530h1036" stroke="#2A3B55"/><g transform="translate(930 187) scale(2)">${shieldMarkup("hero")}</g></svg>`;
 await writeFile(path.join(brandDir, "social-card.svg"), social);
-await sharp(Buffer.from(social))
-  .png()
-  .toFile(path.join(root, "public/social-card.png"));
+const socialPng = await sharp(Buffer.from(social)).png().toBuffer();
+await writeFile(path.join(root, "public/social-card.png"), socialPng);
+await writeFile(path.join(root, "public/og.png"), socialPng);
 const assetVersions = {};
 for (const file of [
   "brand/guardianwaf-logo-dark.svg",
@@ -131,6 +131,7 @@ for (const file of [
   "favicon.svg",
   "apple-touch-icon.png",
   "social-card.png",
+  "og.png",
 ]) {
   assetVersions[`/${file}`] = createHash("sha256")
     .update(await readFile(path.join(root, "public", file)))
