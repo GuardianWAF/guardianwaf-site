@@ -1,4 +1,4 @@
-// Resolve before paint so a saved Off preference never starts the scene briefly.
+// The legacy storage key now controls mouse effects only; ambient motion is separate.
 export const animationScript = `(function(){
 var root=document.documentElement;
 var media=window.matchMedia('(prefers-reduced-motion: reduce)');

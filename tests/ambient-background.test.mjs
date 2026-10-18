@@ -277,7 +277,7 @@ test("hidden objects skip SVG updates and long-page scrolling reuses the same no
   page.cleanup();
 });
 
-test("animation Off disposes every renderer resource and On starts one fresh scene", () => {
+test("mouse effects Off clears input effects while ambient motion stays alive", () => {
   const page = browser(false, true);
   page.visible(true);
   page.frame(0);
@@ -288,17 +288,29 @@ test("animation Off disposes every renderer resource and On starts one fresh sce
   const count = nodes(page.svg).length + nodes(page.overlay).length;
   page.doc.documentElement.dataset.animations = "off";
   page.env.emit("guardian-animations-change");
-  assert.equal(page.pending.size, 0);
-  assert.equal(page.doc.count + page.media.count, 0);
-  assert.equal(page.env.count, 1, "only the preference subscription remains");
-  assert.ok(page.observers.every((o) => o.disconnected));
-  assert.equal(page.svg.children.length + page.overlay.children.length, 0);
+  assert.equal(page.pending.size, 1, "ambient motion must continue");
+  assert.equal(page.doc.listeners.get("pointermove")?.size || 0, 0);
+  assert.equal(page.doc.listeners.get("pointerdown")?.size || 0, 0);
+  assert.ok(page.observers.every((o) => !o.disconnected));
+  assert.equal(nodes(page.svg).length + nodes(page.overlay).length, count);
+  assert.equal(page.svg.dataset.sceneState, "running");
+  const ambient = nodes(page.svg).find(
+    (n) =>
+      n.getAttribute("class") === "ambient-object" &&
+      n.getAttribute("display") === "inline",
+  );
+  const before = ambient.getAttribute("transform");
   assert.equal(page.overlay.dataset.sceneState, "disabled");
   assert.equal(page.overlay.dataset.pulseCount, "0");
   page.pointer("pointermove");
   page.pointer("pointerdown");
   page.pointer("pointerup");
   page.frame(3000);
+  assert.notEqual(
+    ambient.getAttribute("transform"),
+    before,
+    "ambient geometry must keep drifting with mouse effects off",
+  );
   assert.equal(page.overlay.dataset.pulseCount, "0");
   page.doc.documentElement.dataset.animations = "on";
   page.env.emit("guardian-animations-change");
@@ -318,12 +330,20 @@ test("animation Off disposes every renderer resource and On starts one fresh sce
   assert.equal(page.pending.size, 0);
 });
 
-test("reduced-motion default does not mount a renderer; explicit On can restart it", () => {
+test("reduced-motion default keeps a static field; explicit mouse On can start it", () => {
   const page = browser(true, true);
+  page.visible(true);
   assert.equal(page.pending.size, 0);
-  assert.equal(page.observers.length, 0);
-  assert.equal(page.doc.count, 0);
-  assert.equal(page.svg.dataset.sceneState, "disabled");
+  assert.ok(page.observers.length > 0);
+  assert.equal(page.doc.listeners.get("pointermove")?.size || 0, 0);
+  assert.equal(page.svg.dataset.sceneState, "reduced");
+  assert.ok(
+    nodes(page.svg).some(
+      (n) =>
+        n.getAttribute("class") === "ambient-object" &&
+        n.getAttribute("display") === "inline",
+    ),
+  );
   page.doc.documentElement.dataset.animations = "on";
   page.env.emit("guardian-animations-change");
   page.visible(true);
@@ -334,6 +354,35 @@ test("reduced-motion default does not mount a renderer; explicit On can restart 
   page.frame(100);
   assert.equal(page.overlay.dataset.pulseCount, "1");
   page.cleanup();
+});
+
+test("ambient-only mode keeps its phase, pauses offscreen and never accumulates input listeners", () => {
+  const page = browser(false, true);
+  page.visible(true);
+  page.frame(0);
+  page.frame(1000);
+  const count = nodes(page.svg).length + nodes(page.overlay).length;
+  const observers = page.observers.length;
+  for (let i = 0; i < 30; i++) {
+    page.doc.documentElement.dataset.animations = i % 2 ? "on" : "off";
+    page.env.emit("guardian-animations-change");
+    assert.equal(nodes(page.svg).length + nodes(page.overlay).length, count);
+    assert.equal(page.observers.length, observers);
+    assert.equal(
+      page.doc.listeners.get("pointermove")?.size || 0,
+      i % 2 ? 1 : 0,
+    );
+  }
+  page.doc.documentElement.dataset.animations = "off";
+  page.env.emit("guardian-animations-change");
+  page.visible(false);
+  assert.equal(page.pending.size, 0);
+  page.visible(true);
+  assert.equal(page.pending.size, 1);
+  assert.equal(page.svg.dataset.sceneState, "running");
+  assert.equal(page.overlay.dataset.sceneState, "disabled");
+  page.cleanup();
+  assert.equal(page.doc.count + page.env.count + page.media.count, 0);
 });
 
 test("the SVG effect pool never grows under repeated clicks and scans expire by visible time", () => {

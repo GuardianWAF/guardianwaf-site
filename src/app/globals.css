@@ -453,7 +453,6 @@ code,
 .animation-control:focus-within .animation-tooltip {
   visibility: visible;
 }
-:root[data-animations="off"] .site-background,
 :root[data-animations="off"] .site-interactions {
   display: none;
 }

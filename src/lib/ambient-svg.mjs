@@ -33,7 +33,11 @@ export function mountAmbientSvg(
   uid,
   env = window,
   interactionSvg,
-  { respectReducedMotion = true } = {},
+  {
+    respectReducedMotion = true,
+    mouseEffects = true,
+    followMousePreference = false,
+  } = {},
 ) {
   if (!interactionSvg)
     throw new Error("An independent interaction SVG is required");
@@ -298,7 +302,7 @@ export function mountAmbientSvg(
       }
       if (!p.visible) return;
       active++;
-      if (!reduced) {
+      if (!reduced && mouseEffects) {
         const response = fieldResponse(scene, point, p);
         if (response.energy > 0.025) responses.push({ point, p, ...response });
       }
@@ -345,7 +349,7 @@ export function mountAmbientSvg(
       );
     });
     const pointer = scene.pointer;
-    const pointerVisible = !reduced && pointer.strength > 0.01;
+    const pointerVisible = mouseEffects && !reduced && pointer.strength > 0.01;
     pointerGroup.setAttribute("display", pointerVisible ? "inline" : "none");
     if (pointerVisible) {
       pointerGroup.setAttribute(
@@ -447,7 +451,7 @@ export function mountAmbientSvg(
     raf = null;
     if (!canRun()) return;
     const fps =
-      scene.age - scene.lastInteraction < AMBIENT.idleAfter
+      mouseEffects && scene.age - scene.lastInteraction < AMBIENT.idleAfter
         ? AMBIENT.activeFps
         : AMBIENT.idleFps;
     if (previous === null || timestamp - previous >= 1000 / fps - 1) {
@@ -467,7 +471,8 @@ export function mountAmbientSvg(
     previous = null;
     const state = reduced ? "reduced" : canRun() ? "running" : "paused";
     record("sceneState", state);
-    record("sceneState", state, interactionSvg);
+    record("sceneState", mouseEffects ? state : "disabled", interactionSvg);
+    record("mouseEffects", mouseEffects ? "on" : "off", interactionSvg);
     if (reduced) draw();
     else if (canRun()) raf = env.requestAnimationFrame(frame);
   }
@@ -564,8 +569,7 @@ export function mountAmbientSvg(
     leave();
     sync();
   }
-  function preference() {
-    reduced = media.matches;
+  function clearEffects() {
     scene.pulses = [];
     scene.trails = [];
     scene.pointer.strength = 0;
@@ -577,7 +581,34 @@ export function mountAmbientSvg(
       point.orbit = 0;
     });
     leave();
+  }
+  function preference() {
+    const next = respectReducedMotion && media.matches;
+    if (next === reduced) return;
+    reduced = next;
+    clearEffects();
+    bindPointerEvents();
     sync();
+  }
+  function setMouseEffects(enabled) {
+    if (disposed || mouseEffects === enabled) return;
+    mouseEffects = enabled;
+    if (followMousePreference) respectReducedMotion = !enabled;
+    clearEffects();
+    const next = respectReducedMotion && media.matches;
+    const motionChanged = next !== reduced;
+    reduced = next;
+    bindPointerEvents();
+    if (motionChanged) sync();
+    else {
+      record(
+        "sceneState",
+        mouseEffects ? (canRun() ? "running" : "paused") : "disabled",
+        interactionSvg,
+      );
+      record("mouseEffects", mouseEffects ? "on" : "off", interactionSvg);
+    }
+    draw();
   }
   const sizeObserver = new env.ResizeObserver(resize);
   const intersection = env.IntersectionObserver
@@ -598,28 +629,35 @@ export function mountAmbientSvg(
     ["pointerleave", out],
     ["pointerout", out],
   ];
-  events.forEach(([name, listener]) =>
-    doc.addEventListener(name, listener, { passive: true, capture: true }),
-  );
+  let listening = false;
+  function bindPointerEvents() {
+    const active = mouseEffects && !reduced && !disposed;
+    if (active === listening) return;
+    listening = active;
+    events.forEach(([name, listener]) => {
+      if (active)
+        doc.addEventListener(name, listener, { passive: true, capture: true });
+      else doc.removeEventListener(name, listener, true);
+    });
+    if (active) env.addEventListener("blur", leave);
+    else env.removeEventListener("blur", leave);
+  }
+  bindPointerEvents();
   doc.addEventListener("visibilitychange", visibility);
   env.addEventListener("scroll", scroll, { passive: true });
   env.addEventListener("resize", resize, { passive: true });
-  env.addEventListener("blur", leave);
-  if (respectReducedMotion) media.addEventListener("change", preference);
+  media.addEventListener("change", preference);
   sizeObserver.observe(svg);
   resize();
   intersection?.observe(svg);
-  return () => {
+  const dispose = () => {
     disposed = true;
     if (raf !== null) env.cancelAnimationFrame(raf);
-    events.forEach(([name, listener]) =>
-      doc.removeEventListener(name, listener, true),
-    );
+    bindPointerEvents();
     doc.removeEventListener("visibilitychange", visibility);
     env.removeEventListener("scroll", scroll);
     env.removeEventListener("resize", resize);
-    env.removeEventListener("blur", leave);
-    if (respectReducedMotion) media.removeEventListener("change", preference);
+    media.removeEventListener("change", preference);
     sizeObserver.disconnect();
     intersection?.disconnect();
     svg.replaceChildren();
@@ -627,4 +665,6 @@ export function mountAmbientSvg(
     record("sceneState", "disposed");
     record("sceneState", "disposed", interactionSvg);
   };
+  dispose.setMouseEffects = setMouseEffects;
+  return dispose;
 }

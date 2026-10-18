@@ -1,34 +1,21 @@
 import { mountAmbientSvg } from "./ambient-svg.mjs";
 
-// Preference listeners stay lightweight; the entire renderer is disposed on Off.
+// Keep ambient motion alive. Only mouse input/effects follow the header preference.
 export function mountAmbientController(svg, uid, env = window, interactionSvg) {
-  let disposeScene = null;
+  const enabled = () =>
+    svg.ownerDocument.documentElement.dataset.animations === "on";
+  const disposeScene = mountAmbientSvg(svg, uid, env, interactionSvg, {
+    mouseEffects: enabled(),
+    respectReducedMotion: !enabled(),
+    followMousePreference: true,
+  });
   function sync() {
-    const enabled =
-      svg.ownerDocument.documentElement.dataset.animations === "on";
-    if (enabled && !disposeScene) {
-      disposeScene = mountAmbientSvg(svg, uid, env, interactionSvg, {
-        respectReducedMotion: false,
-      });
-    } else if (!enabled && disposeScene) {
-      disposeScene();
-      disposeScene = null;
-    }
-    if (!enabled) {
-      for (const root of [svg, interactionSvg]) {
-        root.dataset.sceneState = "disabled";
-        root.dataset.pulseCount = "0";
-        root.dataset.trailCount = "0";
-        root.dataset.liftCount = "0";
-        root.dataset.activeCount = "0";
-      }
-    }
+    disposeScene.setMouseEffects(enabled());
   }
   env.addEventListener("guardian-animations-change", sync);
   sync();
   return () => {
     env.removeEventListener("guardian-animations-change", sync);
-    disposeScene?.();
-    disposeScene = null;
+    disposeScene();
   };
 }

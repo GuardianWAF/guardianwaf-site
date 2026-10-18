@@ -90,9 +90,10 @@ test("every page includes separate decorative SVG layers and no retired hero can
     assert.doesNotMatch(html, /<canvas\b/);
     assert.match(
       html,
-      /<button[^>]*class="animation-toggle"[^>]*aria-label="Animasyonları kapat"[^>]*aria-pressed="true"[^>]*title="Animasyonları kapat"/,
+      /<button[^>]*class="animation-toggle"[^>]*aria-label="Disable mouse effects"[^>]*aria-pressed="true"[^>]*title="Disable mouse effects"/,
     );
     assert.match(html, /guardian-animations/);
+    assert.doesNotMatch(html, /Animasyonları/);
   }
 });
 
