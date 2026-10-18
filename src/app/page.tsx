@@ -19,7 +19,6 @@ import {
   Zap,
 } from "lucide-react";
 import { ShieldArt, LogoMark, Github, Wordmark } from "@/components/brand";
-import { HeroBackground } from "@/components/hero-background";
 import {
   CopyButton,
   DeploymentTabs,
@@ -51,7 +50,6 @@ export default function Home() {
   return (
     <main id="main">
       <section className="hero-section">
-        <HeroBackground />
         <div className="hero container">
           <div className="hero-copy">
             <a

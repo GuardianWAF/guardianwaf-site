@@ -66,6 +66,22 @@ test("every route is served from the static export, including direct deep links"
   }
 });
 
+test("every page includes one decorative SVG background and no retired hero canvas", async () => {
+  for (const page of pages) {
+    const html = await readFile(path.join(out, page), "utf8");
+    assert.equal(
+      (html.match(/<svg[^>]*class="site-background"[^>]*>/g) || []).length,
+      1,
+      page,
+    );
+    assert.match(
+      html,
+      /<svg[^>]*class="site-background"[^>]*aria-hidden="true"[^>]*focusable="false"/,
+    );
+    assert.doesNotMatch(html, /<canvas\b/);
+  }
+});
+
 test("all local links, Next chunks, preloaded fonts, and image references resolve", async () => {
   const seen = new Set();
   for (const page of pages) {

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Header, Footer } from "@/components/chrome";
+import { AnimatedBackground } from "@/components/animated-background";
 import { brandAsset, siteUrl } from "@/lib/site";
 import { themeScript } from "@/lib/theme";
 import "./globals.css";
@@ -66,6 +67,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className={`${geist.variable} ${mono.variable}`}>
+        <AnimatedBackground />
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}.studio-symbol path{stroke-dasharray:none!important;stroke-dashoffset:0!important}`}</style>
         </noscript>
