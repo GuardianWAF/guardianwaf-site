@@ -19,6 +19,7 @@ import {
   Zap,
 } from "lucide-react";
 import { ShieldArt, LogoMark, Github, Wordmark } from "@/components/brand";
+import { HeroBackground } from "@/components/hero-background";
 import {
   CopyButton,
   DeploymentTabs,
@@ -49,71 +50,78 @@ const protections = [
 export default function Home() {
   return (
     <main id="main">
-      <section className="hero container">
-        <div className="hero-copy">
-          <a
-            className="announcement"
-            href={`${REPO}/releases`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <span className="status-dot" />
-            <span>Small binary. Serious protection.</span>
-            <ArrowUpRight size={13} />
-          </a>
-          <h1>
-            Your traffic.
-            <br />
-            Your rules.
-            <br />
-            <span>Your guardian.</span>
-          </h1>
-          <p className="hero-description">
-            The open-source web application firewall that puts you in control.
-            Pure Go. Zero dependencies. All the protection, none of the baggage.
-          </p>
-          <div className="hero-cta">
-            <Link href="#deploy" className="button button-primary">
-              Meet your guardian <ArrowRight size={17} />
-            </Link>
+      <section className="hero-section">
+        <HeroBackground />
+        <div className="hero container">
+          <div className="hero-copy">
             <a
-              href={REPO}
+              className="announcement"
+              href={`${REPO}/releases`}
               target="_blank"
               rel="noreferrer"
-              className="button button-secondary"
             >
-              <Github size={18} /> View on GitHub <ArrowUpRight size={14} />
+              <span className="status-dot" />
+              <span>Small binary. Serious protection.</span>
+              <ArrowUpRight size={13} />
             </a>
+            <h1>
+              Your traffic.
+              <br />
+              Your rules.
+              <br />
+              <span>Your guardian.</span>
+            </h1>
+            <p className="hero-description">
+              The open-source web application firewall that puts you in control.
+              Pure Go. Zero dependencies. All the protection, none of the
+              baggage.
+            </p>
+            <div className="hero-cta">
+              <Link href="#deploy" className="button button-primary">
+                Meet your guardian <ArrowRight size={17} />
+              </Link>
+              <a
+                href={REPO}
+                target="_blank"
+                rel="noreferrer"
+                className="button button-secondary"
+              >
+                <Github size={18} /> View on GitHub <ArrowUpRight size={14} />
+              </a>
+            </div>
+            <div className="hero-assurances">
+              <span>
+                <Check size={13} /> MIT licensed
+              </span>
+              <span>
+                <Check size={13} /> No vendor lock-in
+              </span>
+              <span>
+                <Check size={13} /> Built in Go
+              </span>
+            </div>
           </div>
-          <div className="hero-assurances">
-            <span>
-              <Check size={13} /> MIT licensed
-            </span>
-            <span>
-              <Check size={13} /> No vendor lock-in
-            </span>
-            <span>
-              <Check size={13} /> Built in Go
-            </span>
+          <div className="hero-art">
+            <ShieldArt />
+            <div className="art-bottom">
+              <span>
+                <ShieldCheck size={14} /> ALWAYS BETWEEN YOU & THE THREAT
+              </span>
+              <span>01 — ∞</span>
+            </div>
           </div>
+          <a
+            className="hero-scroll"
+            href="#overview"
+            aria-label="Explore GuardianWAF"
+          >
+            <ArrowDown size={14} />
+            <span>LESS OVERHEAD. MORE PEACE OF MIND.</span>
+          </a>
+          <span className="hero-network-hint" aria-hidden="true">
+            Move to explore · Click to scan
+          </span>
         </div>
-        <div className="hero-art">
-          <ShieldArt />
-          <div className="art-bottom">
-            <span>
-              <ShieldCheck size={14} /> ALWAYS BETWEEN YOU & THE THREAT
-            </span>
-            <span>01 — ∞</span>
-          </div>
-        </div>
-        <a
-          className="hero-scroll"
-          href="#overview"
-          aria-label="Explore GuardianWAF"
-        >
-          <ArrowDown size={14} />
-          <span>LESS OVERHEAD. MORE PEACE OF MIND.</span>
-        </a>
       </section>
 
       <section className="stats-section" id="overview">

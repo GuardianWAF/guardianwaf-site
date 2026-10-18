@@ -77,6 +77,8 @@ This optional generator uses the `fontkit` and `sharp` development dependencies.
 
 Layout uses shared CSS tokens in `src/app/globals.css`: a fluid gutter and a 1728px maximum shell align navigation, content and footer. Wide screens use four feature tracks and three brand/resource columns; documentation separates readable copy from code panels at 1280px. Text keeps a 68ch reading measure while visual panels can fill the shell. Responsive review targets 375, 768, 1024, 1440, 1920 and 2560px.
 
+The full-width hero uses `HeroBackground`, a Canvas 2D client component. Its request-routing traces, shield nodes, local pointer field and three short scan-wave variants are controlled by `HERO_NETWORK` in `src/lib/hero-network.mjs`. Effects are capped at six scans and fourteen cursor traces; mobile uses fewer nodes and a smaller scan radius. Canvas resolution is capped at 1.75 DPR and 3.2 million pixels. Copy gets a quieter field, and links, controls, selections and touch drags do not trigger scans. The loop pauses offscreen or in a hidden tab, uses a static field for reduced motion, and removes its listeners and observers on unmount. Controller tests cover these lifecycle and interaction boundaries without a graphics dependency.
+
 - Product claims and quick-start examples are grounded in the upstream README, `go.mod`, and `docs/`. The supplied infographic is visual inspiration; its outdated detector/MCP counts are not copied.
 - The `<1ms` p99 value is explicitly described as the upstream performance **target**, not a benchmark performed by this website.
 - The request inspector is an illustration with fixed examples, not a real detection engine. Its scores and the dashboard preview are labeled as illustrative.
