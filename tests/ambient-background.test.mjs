@@ -90,16 +90,28 @@ test("ambient speed follows elapsed time across low and high refresh rates", () 
 
 class Events {
   listeners = new Map();
-  addEventListener(name, listener) {
+  captures = new Map();
+  addEventListener(name, listener, options) {
     const set = this.listeners.get(name) || new Set();
     set.add(listener);
     this.listeners.set(name, set);
+    const capture = this.captures.get(name) || new Map();
+    capture.set(listener, options === true || options?.capture === true);
+    this.captures.set(name, capture);
   }
-  removeEventListener(name, listener) {
-    this.listeners.get(name)?.delete(listener);
+  removeEventListener(name, listener, options) {
+    const capture = options === true || options?.capture === true;
+    if (this.captures.get(name)?.get(listener) === capture) {
+      this.listeners.get(name)?.delete(listener);
+      this.captures.get(name)?.delete(listener);
+    }
   }
   emit(name, event = {}) {
-    this.listeners.get(name)?.forEach((listener) => listener(event));
+    this.listeners.get(name)?.forEach((listener) => {
+      if (event.propagationStopped && !this.captures.get(name)?.get(listener))
+        return;
+      listener(event);
+    });
   }
   get count() {
     return Array.from(this.listeners.values()).reduce(
@@ -125,9 +137,16 @@ class SvgNode {
     return this.attributes.get(key);
   }
   appendChild(node) {
+    node.parentNode = this;
     this.children.push(node);
   }
   replaceChildren(...nodes) {
+    this.children.forEach((node) => {
+      node.parentNode = null;
+    });
+    nodes.forEach((node) => {
+      node.parentNode = this;
+    });
     this.children = nodes;
   }
   getBoundingClientRect() {
@@ -155,6 +174,7 @@ function browser(reduced = false) {
     getSelection: () => selection,
   });
   const svg = new SvgNode("svg", doc);
+  const overlay = new SvgNode("svg", doc);
   const media = Object.assign(new Events(), { matches: reduced });
   class Observer {
     constructor(callback) {
@@ -179,7 +199,7 @@ function browser(reduced = false) {
     MutationObserver: class Mutation extends Observer {},
     IntersectionObserver: class Intersection extends Observer {},
   });
-  const cleanup = mountAmbientSvg(svg, "test", env);
+  const cleanup = mountAmbientSvg(svg, "test", env, overlay);
   const intersection = observers.find(
     (observer) => observer.constructor.name === "Intersection",
   );
@@ -187,6 +207,7 @@ function browser(reduced = false) {
     control = { closest: () => ({}) };
   return {
     svg,
+    overlay,
     doc,
     env,
     media,
@@ -254,14 +275,14 @@ test("the SVG effect pool never grows under repeated clicks and scans expire by 
   const page = browser();
   page.visible(true);
   page.frame(0);
-  const count = nodes(page.svg).length;
+  const count = nodes(page.svg).length + nodes(page.overlay).length;
   for (let i = 0; i < 500; i++) {
     const x = 100 + ((i * 81) % 1200);
     page.pointer("pointerdown", x);
     page.pointer("pointerup", x);
   }
   assert.equal(page.svg.dataset.pulseCount, String(AMBIENT.maxPulses));
-  assert.equal(nodes(page.svg).length, count);
+  assert.equal(nodes(page.svg).length + nodes(page.overlay).length, count);
   for (let i = 1; i <= 4; i++) page.frame(i * 500);
   assert.equal(page.svg.dataset.pulseCount, "0");
   page.cleanup();
@@ -321,9 +342,11 @@ test("hidden/offscreen pause, resume without a time jump, and complete cleanup",
   assert.equal(page.doc.count + page.env.count + page.media.count, 0);
   assert.ok(page.observers.every((observer) => observer.disconnected));
   assert.equal(page.svg.children.length, 0);
+  assert.equal(page.overlay.children.length, 0);
   page.visible(true);
   assert.equal(page.pending.size, 0);
   assert.equal(page.svg.dataset.sceneState, "disposed");
+  assert.equal(page.overlay.dataset.sceneState, "disposed");
 });
 
 test("reduced motion has no animation loop, no effects and no scroll parallax", () => {
@@ -352,5 +375,136 @@ test("reduced motion has no animation loop, no effects and no scroll parallax", 
   page.media.emit("change");
   assert.equal(page.pending.size, 0);
   assert.equal(page.svg.dataset.pulseCount, "0");
+  page.cleanup();
+});
+
+test("interaction waves use an independent viewport overlay above opaque content", () => {
+  const page = browser();
+  page.visible(true);
+  page.frame(0);
+  const effects = nodes(page.overlay).find(
+    (node) => node.getAttribute("class") === "ambient-effects",
+  );
+  assert.ok(
+    effects,
+    "waves must be drawn in the separate overlay, not behind cards",
+  );
+  page.pointer("pointerdown");
+  page.pointer("pointerup");
+  page.frame(100);
+  assert.ok(
+    nodes(effects).some(
+      (node) =>
+        node.getAttribute("class") === "ambient-pulse" &&
+        node.getAttribute("display") === "inline",
+    ),
+  );
+  page.cleanup();
+  assert.equal(page.overlay.children.length, 0);
+});
+
+test("copy bounds cannot cut SVG geometry into rectangular fragments", () => {
+  const page = browser();
+  page.doc.querySelectorAll = () => [
+    {
+      getBoundingClientRect: () => ({
+        left: 300,
+        top: 200,
+        bottom: 260,
+        width: 200,
+        height: 60,
+      }),
+    },
+  ];
+  page.visible(true);
+  page.frame(0);
+  const cutouts = [...nodes(page.svg), ...nodes(page.overlay)].filter(
+    (node) => node.name === "rect" && node.getAttribute("opacity") === "0.88",
+  );
+  assert.equal(
+    cutouts.length,
+    0,
+    "text rectangles must not punch hard-edged holes into the field or waves",
+  );
+  page.cleanup();
+});
+
+test("nearby objects have a clearly visible response while distant objects stay calm", () => {
+  const scene = createField(1920, 1080);
+  const point = scene.points.find(
+    (point) => point.depth > 0.85 && fieldPosition(scene, point).visible,
+  );
+  const p = fieldPosition(scene, point);
+  moveFieldPointer(scene, p.x - 35, p.y);
+  for (let i = 0; i < 60; i++) advanceField(scene, 1 / 60);
+  assert.ok(
+    Math.hypot(point.ox, point.oy) > 22,
+    "nearby displacement must be noticeable, exceeding 22 CSS pixels",
+  );
+});
+
+test("capture tracks content hover and keeps viewport coordinates while scrolling", () => {
+  const page = browser();
+  page.visible(true);
+  page.frame(0);
+  page.pointer("pointermove", 620, 350, page.control, {
+    propagationStopped: true,
+  });
+  page.frame(100);
+  const cursor = nodes(page.overlay).find(
+    (node) => node.getAttribute("class") === "ambient-pointer",
+  );
+  assert.equal(cursor.getAttribute("transform"), "translate(620 350)");
+  page.env.scrollY = 12000;
+  page.env.emit("scroll");
+  for (let i = 1; i <= 120; i++) page.frame(100 + i * 17);
+  assert.equal(cursor.getAttribute("display"), "inline");
+  assert.equal(cursor.getAttribute("transform"), "translate(620 350)");
+  assert.ok(Number(cursor.getAttribute("opacity")) > 0.95);
+  page.pointer("pointerdown", 620, 350);
+  page.pointer("pointerup", 620, 350);
+  page.frame(2200);
+  const wave = nodes(page.overlay).find(
+    (node) =>
+      node.getAttribute("class") === "ambient-pulse" &&
+      node.getAttribute("display") === "inline",
+  );
+  assert.equal(wave.getAttribute("transform"), "translate(620 350)");
+  page.cleanup();
+});
+
+test("light trails are pooled, bounded and fade on pointer exit without blocking input", () => {
+  const page = browser();
+  page.visible(true);
+  page.frame(0);
+  const count = nodes(page.svg).length + nodes(page.overlay).length;
+  let blocked = 0;
+  for (let i = 0; i < 500; i++) {
+    page.pointer(
+      "pointermove",
+      100 + ((i * 47) % 1200),
+      250 + ((i * 31) % 400),
+      undefined,
+      {
+        preventDefault: () => {
+          blocked++;
+        },
+      },
+    );
+  }
+  page.frame(16);
+  assert.equal(Number(page.overlay.dataset.trailCount), AMBIENT.maxTrails);
+  assert.ok(Number(page.overlay.dataset.liftCount) <= AMBIENT.maxLifted);
+  assert.equal(nodes(page.svg).length + nodes(page.overlay).length, count);
+  assert.equal(blocked, 0);
+  page.pointer("pointerout", 500, 400, undefined, { relatedTarget: null });
+  for (let i = 1; i <= 150; i++) page.frame(16 + i * 17);
+  assert.equal(page.overlay.dataset.trailCount, "0");
+  assert.equal(
+    nodes(page.overlay)
+      .find((node) => node.getAttribute("class") === "ambient-pointer")
+      .getAttribute("display"),
+    "none",
+  );
   page.cleanup();
 });

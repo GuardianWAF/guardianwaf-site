@@ -8,13 +8,17 @@ export const AMBIENT = Object.freeze({
   motionSpeed: 0.18,
   drift: 12,
   scrollDepth: 0.18,
-  copyPadding: 22,
-  pointerRadius: 180,
-  pointerForce: 20,
+  pointerRadius: 270,
+  pointerForce: 64,
+  pointerSwirl: 0.28,
+  maxLifted: 10,
+  maxTrails: 18,
+  trailLife: 0.72,
   maxPulses: 4,
-  pulseRadius: 190,
-  pulseLife: 1.8,
-  particles: 6,
+  pulseRadius: 300,
+  pulseLife: 1.65,
+  pulseForce: 38,
+  particles: 8,
   idleAfter: 3,
   idleFps: 24,
   activeFps: 60,
@@ -59,6 +63,7 @@ export function createField(width, height) {
     scroll: 0,
     pointer: { x: 0, y: 0, active: false, strength: 0 },
     pulses: [],
+    trails: [],
     variant: 0,
     points: Array.from({ length: count }, (_, i) => ({
       x: (((i % columns) + 0.35 + seed(i + 4) * 0.3) / columns) * width,
@@ -94,6 +99,11 @@ export function fieldPosition(scene, point, reduced = false) {
 }
 
 export function moveFieldPointer(scene, x, y) {
+  const previous = scene.pointer;
+  if (previous.active && Math.hypot(previous.x - x, previous.y - y) > 3) {
+    scene.trails.push({ x: previous.x, y: previous.y, toX: x, toY: y, age: 0 });
+    if (scene.trails.length > AMBIENT.maxTrails) scene.trails.shift();
+  }
   Object.assign(scene.pointer, { x, y, active: true });
   scene.lastInteraction = scene.age;
 }
@@ -103,7 +113,7 @@ export function addFieldPulse(scene, x, y) {
   scene.lastInteraction = scene.age;
   const last = scene.pulses.at(-1);
   if (last && last.age < 0.18 && Math.hypot(last.x - x, last.y - y) < 45) {
-    last.energy = Math.min(1.25, last.energy + 0.08);
+    last.energy = Math.min(1.4, last.energy + 0.1);
     return;
   }
   scene.pulses.push({ x, y, age: 0, energy: 1, variant: scene.variant++ % 3 });
@@ -118,6 +128,23 @@ export function fieldPulseRadius(scene, pulse) {
   );
 }
 
+export function fieldResponse(scene, point, p = fieldPosition(scene, point)) {
+  const radius = AMBIENT.pointerRadius * (scene.mobile ? 0.7 : 1);
+  const pointer =
+    smooth(
+      1 - Math.hypot(p.x - scene.pointer.x, p.y - scene.pointer.y) / radius,
+    ) * scene.pointer.strength;
+  let wave = 0;
+  for (const pulse of scene.pulses) {
+    const distance = Math.hypot(p.x - pulse.x, p.y - pulse.y);
+    wave +=
+      Math.exp(-Math.pow((distance - fieldPulseRadius(scene, pulse)) / 58, 2)) *
+      (1 - pulse.age / AMBIENT.pulseLife) *
+      pulse.energy;
+  }
+  return { pointer, energy: Math.min(1, pointer + wave) };
+}
+
 export function advanceField(scene, seconds) {
   const dt = Math.max(0, seconds);
   scene.age += dt;
@@ -129,6 +156,9 @@ export function advanceField(scene, seconds) {
   scene.pulses = scene.pulses.filter(
     (pulse) => (pulse.age += dt) < AMBIENT.pulseLife,
   );
+  scene.trails = scene.trails.filter(
+    (trail) => (trail.age += dt) < AMBIENT.trailLife,
+  );
   for (const point of scene.points) {
     const p = fieldPosition(scene, point);
     if (!p.visible) {
@@ -139,21 +169,27 @@ export function advanceField(scene, seconds) {
     const dx = p.x - pointer.x,
       dy = p.y - pointer.y;
     const distance = Math.hypot(dx, dy);
-    const force =
-      smooth(1 - distance / AMBIENT.pointerRadius) *
-      pointer.strength *
-      AMBIENT.pointerForce *
-      point.depth;
-    let tx = (dx / Math.max(1, distance)) * force;
-    let ty = (dy / Math.max(1, distance)) * force;
+    const response = fieldResponse(scene, point, p);
+    const force = response.pointer * AMBIENT.pointerForce * point.depth;
+    const radius = AMBIENT.pointerRadius * (scene.mobile ? 0.7 : 1);
+    const radial =
+      force * (1 - 1.55 * smooth((distance / radius - 0.25) / 0.5));
+    const swirl =
+      force * AMBIENT.pointerSwirl * Math.sin(scene.time * 1.4 + point.phase);
+    const nx = dx / Math.max(1, distance),
+      ny = dy / Math.max(1, distance);
+    let tx = nx * radial - ny * swirl;
+    let ty = ny * radial + nx * swirl;
     for (const pulse of scene.pulses) {
       const px = p.x - pulse.x,
         py = p.y - pulse.y,
         pd = Math.hypot(px, py);
       const energy =
-        Math.exp(-Math.pow((pd - fieldPulseRadius(scene, pulse)) / 28, 2)) *
+        Math.exp(-Math.pow((pd - fieldPulseRadius(scene, pulse)) / 58, 2)) *
         (1 - pulse.age / AMBIENT.pulseLife) *
-        9;
+        pulse.energy *
+        AMBIENT.pulseForce *
+        point.depth;
       tx += (px / Math.max(1, pd)) * energy;
       ty += (py / Math.max(1, pd)) * energy;
     }

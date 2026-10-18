@@ -58,26 +58,44 @@ body {
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
 }
-.site-background {
-  --ambient-line: #4c80b8;
-  --ambient-ink: #9acbff;
-  --ambient-opacity: 0.6;
+.site-background,
+.site-interactions {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   display: block;
   overflow: hidden;
-  z-index: 0;
   pointer-events: none;
   user-select: none;
-  opacity: var(--ambient-opacity);
   contain: strict;
+}
+.site-background {
+  --ambient-line: #4c80b8;
+  --ambient-ink: #9acbff;
+  --ambient-opacity: 0.42;
+  z-index: 0;
+  opacity: var(--ambient-opacity);
+}
+.site-interactions {
+  --ambient-line: #70b5ff;
+  --ambient-ink: #9ad3ff;
+  --interaction-opacity: 0.72;
+  --pointer-glow: 0.14;
+  z-index: 60;
+  color: var(--ambient-ink);
+  opacity: var(--interaction-opacity);
 }
 :root[data-theme="light"] .site-background {
   --ambient-line: #5e87bd;
   --ambient-ink: #3475c7;
-  --ambient-opacity: 0.48;
+  --ambient-opacity: 0.3;
+}
+:root[data-theme="light"] .site-interactions {
+  --ambient-line: #3679cb;
+  --ambient-ink: #2470cc;
+  --interaction-opacity: 0.52;
+  --pointer-glow: 0.08;
 }
 .ambient-trace {
   stroke: var(--ambient-line);
@@ -98,8 +116,46 @@ body {
 .ambient-pulse {
   color: var(--ambient-ink);
   stroke: currentColor;
-  stroke-width: 1.15;
+  stroke-width: 1.6;
   fill: currentColor;
+}
+.site-interactions .ambient-glyph {
+  stroke-width: 1.15;
+  stroke-opacity: 0.9;
+}
+.ambient-pointer-glow {
+  opacity: var(--pointer-glow);
+}
+.ambient-cursor-ring,
+.ambient-cursor-core,
+.ambient-pointer-link,
+.ambient-trail-soft,
+.ambient-trail-core {
+  stroke: var(--ambient-ink);
+  stroke-linecap: round;
+}
+.ambient-cursor-ring {
+  stroke-width: 1;
+  stroke-opacity: 0.6;
+}
+.ambient-cursor-core {
+  stroke-width: 1;
+  stroke-opacity: 0.35;
+}
+.ambient-pointer-link {
+  stroke-width: 0.9;
+}
+.ambient-trail-soft {
+  stroke-width: 9;
+  stroke-opacity: 0.12;
+}
+.ambient-trail-core {
+  stroke-width: 1.8;
+  stroke-opacity: 0.85;
+}
+.ambient-wave-halo {
+  stroke-width: 10;
+  stroke-opacity: 0.12;
 }
 body > main,
 body > .site-footer {
@@ -3789,6 +3845,9 @@ code,
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .site-interactions {
+    display: none;
+  }
   html {
     scroll-behavior: auto;
   }
