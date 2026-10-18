@@ -4,6 +4,8 @@ import {
   AMBIENT,
   createField,
   fieldPosition,
+  fieldResponse,
+  fieldRelayEnergy,
   moveFieldPointer,
   addFieldPulse,
   advanceField,
@@ -506,5 +508,127 @@ test("light trails are pooled, bounded and fade on pointer exit without blocking
       .getAttribute("display"),
     "none",
   );
+  page.cleanup();
+});
+
+test("stationary pointer produces continuous curved motion with bounded inertia", () => {
+  const run = (fps) => {
+    const scene = createField(1440, 900);
+    const point = scene.points.find(
+      (p) => p.depth > 0.85 && fieldPosition(scene, p).visible,
+    );
+    const start = fieldPosition(scene, point);
+    moveFieldPointer(scene, start.x - 70, start.y);
+    let travel = 0,
+      previous = fieldPosition(scene, point);
+    for (let i = 0; i < fps * 3; i++) {
+      advanceField(scene, 1 / fps);
+      const p = fieldPosition(scene, point);
+      const step = Math.hypot(p.x - previous.x, p.y - previous.y);
+      assert.ok(step < 10, "spring motion must not jump between frames");
+      assert.ok(Math.hypot(point.ox, point.oy) < AMBIENT.maxOffset + 4);
+      if (i > fps) travel += step;
+      previous = p;
+    }
+    assert.ok(
+      travel > 35,
+      "objects should keep flowing around a stationary cursor",
+    );
+    assert.ok(
+      Math.abs(point.oy) > 12,
+      "motion must curve beyond radial repulsion",
+    );
+    return { scene, point };
+  };
+  const slow = run(30),
+    fast = run(120);
+  assert.ok(
+    Math.hypot(slow.point.ox - fast.point.ox, slow.point.oy - fast.point.oy) <
+      6,
+  );
+  slow.scene.pointer.active = false;
+  for (let i = 0; i < 300; i++) advanceField(slow.scene, 1 / 60);
+  assert.ok(Math.hypot(slow.point.ox, slow.point.oy) < 0.1);
+});
+
+test("click relays visit neighbours in order, attenuate and expire with their parent", () => {
+  const scene = createField(1440, 900);
+  scene.points = Array.from({ length: 7 }, (_, i) => ({
+    ...scene.points[0],
+    x: 200 + i * 130,
+    y: 400 + AMBIENT.overscan - 12,
+    phase: 0,
+    depth: 1,
+    speed: 0,
+  }));
+  addFieldPulse(scene, 100, 400);
+  const pulse = scene.pulses[0];
+  assert.ok(pulse.relays.length >= 3);
+  assert.ok(pulse.relays.length <= AMBIENT.relayCount);
+  assert.equal(
+    new Set(pulse.relays.map((r) => r.point)).size,
+    pulse.relays.length,
+  );
+  assert.equal(pulse.relays[0].point, scene.points[0]);
+  for (let i = 1; i < pulse.relays.length; i++) {
+    assert.ok(pulse.relays[i].delay > pulse.relays[i - 1].delay);
+    assert.ok(pulse.relays[i].energy < pulse.relays[i - 1].energy);
+    assert.equal(pulse.relays[i].from, pulse.relays[i - 1].point);
+  }
+  const last = pulse.relays.at(-1);
+  assert.equal(fieldRelayEnergy(pulse, last), 0);
+  pulse.age = last.delay + AMBIENT.relayLife / 2;
+  assert.ok(fieldRelayEnergy(pulse, last) > 0.1);
+  const before = fieldResponse(scene, last.point).energy;
+  const plan = pulse.relays;
+  pulse.relays = [];
+  assert.ok(
+    before - fieldResponse(scene, last.point).energy > 0.1,
+    "a downstream shape must respond after the primary wave has passed",
+  );
+  pulse.relays = plan;
+  advanceField(scene, 2);
+  assert.equal(scene.pulses.length, 0);
+  assert.equal(fieldResponse(scene, last.point).energy, 0);
+  addFieldPulse(scene, 1400, 50);
+  assert.equal(
+    scene.pulses[0].relays.length,
+    0,
+    "empty areas must not create distant relays",
+  );
+});
+
+test("relay rendering stays pooled, follows scroll and disappears in reduced motion", () => {
+  const page = browser();
+  page.visible(true);
+  page.frame(0);
+  const count = nodes(page.overlay).length;
+  page.pointer("pointerdown", 500, 400);
+  page.pointer("pointerup", 500, 400);
+  let seen = false;
+  for (let i = 1; i < 80; i++) {
+    page.frame(i * 17);
+    const visible = nodes(page.overlay).filter(
+      (node) =>
+        node.getAttribute("class") === "ambient-relay" &&
+        node.getAttribute("display") === "inline",
+    );
+    if (visible.length) seen = true;
+    assert.ok(visible.length <= AMBIENT.relayCount * AMBIENT.maxPulses);
+    if (i === 20) {
+      page.env.scrollY = 120;
+      page.env.emit("scroll");
+    }
+  }
+  assert.ok(seen, "a click should visibly relay between nearby shapes");
+  assert.equal(nodes(page.overlay).length, count);
+  page.media.matches = true;
+  page.media.emit("change");
+  assert.ok(
+    nodes(page.overlay)
+      .filter((n) => n.getAttribute("class") === "ambient-relay")
+      .every((n) => n.getAttribute("display") === "none"),
+  );
+  assert.equal(page.pending.size, 0);
   page.cleanup();
 });

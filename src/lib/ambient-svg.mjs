@@ -6,6 +6,7 @@ import {
   moveFieldPointer,
   addFieldPulse,
   fieldPulseRadius,
+  fieldRelayEnergy,
   advanceField,
 } from "./ambient-field.mjs";
 
@@ -244,7 +245,25 @@ export function mountAmbientSvg(svg, uid, env = window, interactionSvg) {
     const particles = Array.from({ length: AMBIENT.particles }, () =>
       element("rect", { x: -1.6, y: -1.6, width: 3.2, height: 3.2 }, group),
     );
-    return { group, rings, halo, particles, visible: false };
+    const relays = Array.from({ length: AMBIENT.relayCount }, () => {
+      const relayGroup = element(
+        "g",
+        { class: "ambient-relay", display: "none" },
+        effectsLayer,
+      );
+      const link = element(
+        "path",
+        { class: "ambient-relay-link", fill: "none" },
+        relayGroup,
+      );
+      const ring = element(
+        "circle",
+        { class: "ambient-relay-ring", fill: "none", r: 1 },
+        relayGroup,
+      );
+      return { group: relayGroup, link, ring };
+    });
+    return { group, rings, halo, particles, relays, visible: false };
   });
   const media = env.matchMedia("(prefers-reduced-motion: reduce)");
   let reduced = media.matches,
@@ -342,7 +361,7 @@ export function mountAmbientSvg(svg, uid, env = window, interactionSvg) {
       if (!response) return;
       link.setAttribute(
         "d",
-        `M${number(pointer.x)} ${number(pointer.y)}L${number(response.p.x)} ${number(response.p.y)}`,
+        `M${number(pointer.x)} ${number(pointer.y)}Q${number((pointer.x + response.p.x) / 2 - (response.p.y - pointer.y) * 0.18)} ${number((pointer.y + response.p.y) / 2 + (response.p.x - pointer.x) * 0.18)} ${number(response.p.x)} ${number(response.p.y)}`,
       );
       link.setAttribute("opacity", number(response.pointer * 0.5));
     });
@@ -353,6 +372,33 @@ export function mountAmbientSvg(svg, uid, env = window, interactionSvg) {
         slot.group.setAttribute("display", visible ? "inline" : "none");
         slot.visible = visible;
       }
+      slot.relays.forEach((relaySlot, i) => {
+        const relay = !reduced && pulse?.relays[i];
+        const energy = relay ? fieldRelayEnergy(pulse, relay) : 0;
+        relaySlot.group.setAttribute(
+          "display",
+          energy > 0.005 ? "inline" : "none",
+        );
+        if (energy <= 0.005) return;
+        const p = fieldPosition(scene, relay.point);
+        if (!p.visible) {
+          relaySlot.group.setAttribute("display", "none");
+          return;
+        }
+        const from = relay.from ? fieldPosition(scene, relay.from) : pulse;
+        const progress = (pulse.age - relay.delay) / AMBIENT.relayLife;
+        relaySlot.group.setAttribute("opacity", number(energy * 0.65));
+        relaySlot.link.setAttribute(
+          "d",
+          `M${number(from.x)} ${number(from.y)}Q${number((from.x + p.x) / 2 - (p.y - from.y) * 0.16)} ${number((from.y + p.y) / 2 + (p.x - from.x) * 0.16)} ${number(p.x)} ${number(p.y)}`,
+        );
+        relaySlot.ring.setAttribute("cx", number(p.x));
+        relaySlot.ring.setAttribute("cy", number(p.y));
+        relaySlot.ring.setAttribute(
+          "r",
+          number(10 + progress * (scene.mobile ? 45 : 75)),
+        );
+      });
       if (!pulse || reduced) return;
       const progress = pulse.age / AMBIENT.pulseLife;
       const radius = fieldPulseRadius(scene, pulse);
@@ -520,6 +566,9 @@ export function mountAmbientSvg(svg, uid, env = window, interactionSvg) {
     scene.points.forEach((point) => {
       point.ox = 0;
       point.oy = 0;
+      point.vx = 0;
+      point.vy = 0;
+      point.orbit = 0;
     });
     leave();
     sync();

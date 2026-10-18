@@ -157,6 +157,15 @@ body {
   stroke-width: 10;
   stroke-opacity: 0.12;
 }
+.ambient-relay-link,
+.ambient-relay-ring {
+  stroke: var(--ambient-ink);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+.ambient-relay-link {
+  stroke-opacity: 0.55;
+}
 body > main,
 body > .site-footer {
   position: relative;
