@@ -69,9 +69,21 @@ test("ambient travel follows elapsed time across refresh rates and clamps stale 
   for (let i = 0; i < 60; i++) advanceNetwork(slow, 1 / 30);
   for (let i = 0; i < 240; i++) advanceNetwork(fast, 1 / 120);
   assert.ok(Math.abs(slow.time - fast.time) < 1e-10);
-  const previous = slow.age;
+  const previous = slow.time;
   advanceNetwork(slow, 600);
-  assert.ok(slow.age - previous <= 0.051);
+  assert.ok(slow.time - previous <= 0.051);
+});
+
+test("slow foreground frames cannot prolong scans or cursor trails", () => {
+  const scene = createNetwork(1600, 800);
+  addPulse(scene, 400, 300);
+  movePointer(scene, 400, 300);
+  scene.pointer.active = false;
+  scene.pointer.strength = 1;
+  for (let i = 0; i < 4; i++) advanceNetwork(scene, 0.5);
+  assert.equal(scene.pulses.length, 0);
+  assert.equal(scene.trails.length, 0);
+  assert.ok(scene.pointer.strength < 0.001);
 });
 
 class Events {

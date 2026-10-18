@@ -143,13 +143,23 @@ export function addPulse(scene, x, y) {
 }
 
 export function advanceNetwork(scene, seconds) {
-  const dt = clamp(seconds, 0, 0.05);
-  scene.age += dt;
+  const elapsed = Math.max(0, seconds);
+  const dt = clamp(elapsed, 0, 0.05);
+  // Bound visual travel, but never stretch effect lifetimes on a slow frame.
+  // The controller resets its clock while paused, so hidden time is excluded.
+  scene.age += elapsed;
   const awake = scene.age - scene.lastInteraction < HERO_NETWORK.idleAfter;
   scene.time += dt * (awake ? 1 : 0.6) * HERO_NETWORK.motionSpeed;
   const pointer = scene.pointer;
   pointer.strength +=
-    ((pointer.active ? 1 : 0) - pointer.strength) * (1 - Math.exp(-dt * 6));
+    ((pointer.active ? 1 : 0) - pointer.strength) *
+    (1 - Math.exp(-elapsed * 6));
+  scene.pulses = scene.pulses.filter(
+    (pulse) => (pulse.age += elapsed) < HERO_NETWORK.pulseLife,
+  );
+  scene.trails = scene.trails.filter(
+    (trail) => (trail.age += elapsed) < HERO_NETWORK.trailLife,
+  );
   for (const point of scene.points) {
     const dx = point.x - pointer.x,
       dy = point.y - pointer.y;
@@ -173,16 +183,10 @@ export function advanceNetwork(scene, seconds) {
       tx += (px / Math.max(pd, 1)) * energy;
       ty += (py / Math.max(pd, 1)) * energy;
     }
-    const blend = 1 - Math.exp(-dt * 7);
+    const blend = 1 - Math.exp(-elapsed * 7);
     point.ox += (tx - point.ox) * blend;
     point.oy += (ty - point.oy) * blend;
   }
-  scene.pulses = scene.pulses.filter(
-    (pulse) => (pulse.age += dt) < HERO_NETWORK.pulseLife,
-  );
-  scene.trails = scene.trails.filter(
-    (trail) => (trail.age += dt) < HERO_NETWORK.trailLife,
-  );
 }
 
 function pulseRadius(scene, pulse) {
