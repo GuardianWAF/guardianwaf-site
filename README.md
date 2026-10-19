@@ -89,3 +89,5 @@ Layout uses shared CSS tokens in `src/app/globals.css`: a fluid gutter and a 172
 ## Dependency audit
 
 At implementation, `npm audit --omit=dev` reported zero vulnerabilities. Full `npm audit` reported an unpatched `braces` denial-of-service advisory (GHSA-vfj7-8cjw-p6xm) through the Next ESLint development dependency chain. The npm-proposed fix downgrades `eslint-config-next` to 14.x and is not applied to this Next.js 16 project. Recheck advisories before publication; these tools do not ship in the static site.
+
+The final OXOG footer block follows the Mammoth Engine reference: one link, matching four-path SVG, six-second staggered drawing loop, copy, spacing and local Manrope/Space Grotesk fonts. It pauses outside the viewport and becomes static for reduced motion. There are no project cards or content below the block. Font licenses are included in public/licenses/.

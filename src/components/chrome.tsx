@@ -108,7 +108,6 @@ export function Footer() {
           </a>
         </div>
       </div>
-      <StudioSignature />
       <div className="footer-bottom">
         <span>
           © {new Date().getFullYear()} GuardianWAF. Open source under MIT.
@@ -117,6 +116,7 @@ export function Footer() {
           Built with Go. Made for everyone. <LogoMark className="tiny-shield" />
         </span>
       </div>
+      <StudioSignature />
     </footer>
   );
 }

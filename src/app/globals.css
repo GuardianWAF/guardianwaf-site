@@ -2066,245 +2066,157 @@ code,
   vertical-align: middle;
 }
 .studio-signature {
-  --studio-pink: #ed0878;
-  --studio-purple: #a35adb;
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  grid-template-columns: 140px minmax(0, 1fr) 196px;
+  --studio-purple: #b477e4;
+  --studio-text: #f6f0e4;
+  --studio-muted: #b5b2b9;
+  --studio-accent: #e7d2a4;
+  --studio-line: #373b50;
+  --studio-background: #111426;
+  --studio-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  display: flex;
   align-items: center;
-  gap: 38px;
-  margin-top: 32px;
-  padding: 36px;
-  border: 1px solid var(--border);
-  border-radius: 20px;
+  gap: clamp(30px, 4vw, 70px);
+  padding: 35px 45px;
+  margin-bottom: 32px;
+  border: 1px solid var(--studio-line);
+  border-radius: 7px;
   background:
-    radial-gradient(ellipse at 100% 0%, #ed08780c, transparent 55%),
-    radial-gradient(ellipse at 50% 110%, #a35adb0a, transparent 60%),
-    var(--surface);
+    radial-gradient(
+      ellipse at 15% 30%,
+      color-mix(in srgb, #ed0878 4%, transparent),
+      transparent 65%
+    ),
+    var(--studio-background);
+  color: var(--studio-text);
+  font-family: var(--font-studio-body), sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
 }
 :root[data-theme="light"] .studio-signature {
   --studio-purple: #692d91;
-  background:
-    radial-gradient(ellipse at 100% 0%, #ed087809, transparent 55%),
-    radial-gradient(ellipse at 50% 110%, #692d9106, transparent 60%),
-    var(--surface);
+  --studio-text: #191c32;
+  --studio-muted: #65605a;
+  --studio-accent: #333957;
+  --studio-line: #ded4c2;
+  --studio-background: #faf6ee;
 }
-.studio-symbol {
-  display: block;
-  width: 100%;
-  max-width: 140px;
-}
-.studio-symbol svg {
-  display: block;
-  width: 100%;
-}
-.studio-signature .studio-symbol path {
-  stroke-dasharray: 400;
-  stroke-dashoffset: 400;
-}
-.studio-signature[data-logo-state="draw"] .studio-symbol path {
-  animation: studio-logo-draw 1.6s cubic-bezier(0.6, 0.1, 0.2, 1) both;
-}
-.studio-signature[data-logo-state="draw"] .studio-symbol path:nth-child(2) {
-  animation-delay: 0.25s;
-}
-.studio-signature[data-logo-state="draw"] .studio-symbol path:nth-child(3) {
-  animation-delay: 0.5s;
-}
-.studio-signature[data-logo-state="draw"] .studio-symbol path:nth-child(4) {
-  animation-delay: 0.9s;
-}
-@keyframes studio-logo-draw {
-  from {
-    stroke-dashoffset: 400;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
+.studio-signature .oxog-mark {
+  width: 105px;
+  height: auto;
+  flex-shrink: 0;
+  vertical-align: middle;
 }
 .studio-copy {
   min-width: 0;
 }
 .studio-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 8px;
-  letter-spacing: 1.25px;
-  color: var(--subtle);
-  margin-bottom: 19px;
-}
-.studio-byline {
-  font-size: 12px;
-  margin-bottom: 5px;
+  display: block;
+  font: 8px / 1.6 var(--studio-mono);
+  letter-spacing: 0.12em;
+  color: var(--studio-accent);
+  margin-bottom: 9px;
 }
 .studio-copy h2 {
-  font-size: 42px;
-  line-height: 1.05;
-  letter-spacing: -1.8px;
+  font-family: var(--font-studio-display), sans-serif;
+  font-size: 35px;
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.045em;
   margin: 0;
 }
-.studio-wordmark {
-  display: inline-flex;
-  align-items: baseline;
-  font-weight: 700;
+.studio-copy h2 > span {
+  color: var(--studio-muted);
 }
-.studio-wordmark > span:first-child {
-  font-weight: 400;
-  color: var(--muted);
-}
-.studio-period {
-  color: var(--studio-pink);
-}
-.studio-wordmark svg {
-  align-self: center;
-  margin-left: 13px;
-  color: var(--muted);
-  transition: transform 0.2s ease;
-}
-.studio-wordmark:hover svg {
-  transform: translate(3px, -3px);
-  color: var(--studio-pink);
-}
-.studio-description {
-  font-size: 13px;
-  line-height: 1.85;
-  margin-top: 17px;
-  max-width: 520px;
-}
-.studio-explore {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 18px;
+.studio-copy p {
   font-size: 11px;
-  font-weight: 500;
+  line-height: 1.7;
+  color: var(--studio-muted);
+  margin: 9px 0 0;
 }
-.studio-explore:hover {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-.studio-projects {
-  display: grid;
-  gap: 8px;
-}
-.studio-project {
-  display: grid;
-  gap: 3px;
-  min-height: 55px;
-  padding: 11px 13px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: color-mix(in srgb, var(--background) 32%, transparent);
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease;
-}
-.studio-project:hover {
-  border-color: color-mix(in srgb, var(--studio-pink) 50%, var(--border));
-  background: color-mix(in srgb, var(--studio-pink) 4%, var(--surface));
-}
-.studio-project-name {
+.studio-link {
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
   align-items: center;
-  gap: 8px;
+  margin-left: auto;
+  white-space: nowrap;
   font-size: 12px;
-  font-weight: 600;
+  color: var(--studio-accent);
 }
-.studio-project-name svg {
-  color: var(--subtle);
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease;
+.studio-signature:hover {
+  border-color: #ed0878;
 }
-.studio-project:hover .studio-project-name svg {
-  color: var(--studio-pink);
-  transform: translate(1px, -1px);
-}
-.studio-project-description {
-  font-size: 10px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
   .studio-signature {
-    grid-template-columns: 110px minmax(0, 1fr) 175px;
-    gap: 25px;
-    padding: 28px;
+    padding: 30px;
+    gap: 30px;
   }
   .studio-copy h2 {
-    font-size: 37px;
-  }
-  .studio-description {
-    font-size: 12px;
-  }
-  .studio-eyebrow {
-    font-size: 7px;
-    letter-spacing: 0.8px;
+    font-size: 29px;
   }
 }
 @media (max-width: 800px) {
   .studio-signature {
-    grid-template-columns: 110px minmax(0, 1fr);
-    gap: 26px;
+    flex-wrap: wrap;
   }
-  .studio-projects {
-    grid-column: 1 / -1;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .studio-project {
-    padding: 10px;
-  }
-  .studio-project-name {
-    font-size: 11px;
-  }
-  .studio-project-description {
-    font-size: 8px;
+  .studio-link {
+    width: 100%;
+    margin: 0;
+    justify-content: end;
   }
 }
-@media (max-width: 600px) {
+@media (max-width: 520px) {
   .studio-signature {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 24px;
-    padding: 26px 22px;
-    margin-top: 27px;
-    border-radius: 15px;
+    padding: 25px;
+    gap: 22px;
   }
-  .studio-symbol {
-    max-width: 100px;
+  .studio-signature .oxog-mark {
+    width: 65px;
+  }
+  .studio-copy {
+    flex: 1;
   }
   .studio-eyebrow {
-    margin-bottom: 13px;
-    font-size: 6.5px;
-    letter-spacing: 0.85px;
-  }
-  .studio-byline {
-    font-size: 10px;
+    font-size: 6px;
   }
   .studio-copy h2 {
-    font-size: 39px;
+    font-size: 25px;
   }
-  .studio-description {
-    font-size: 12px;
-    margin-top: 14px;
+  .studio-copy h2 > span {
+    display: block;
   }
-  .studio-explore {
+  .studio-copy p {
+    font-size: 9px;
+  }
+  .studio-link {
     font-size: 10px;
   }
-  .studio-projects {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .studio-signature .oxog-mark path {
+    stroke-dasharray: 400;
+    animation: studio-logo-draw 6s ease-in-out var(--draw-delay, 0s) infinite;
+    animation-play-state: paused;
   }
-  .studio-project {
-    min-height: 66px;
-    padding: 12px 10px;
-    align-content: start;
+  .studio-signature[data-logo-state="draw"] .oxog-mark path {
+    animation-play-state: running;
   }
-  .studio-project-name {
-    font-size: 11px;
+  .oxog-mark path:nth-child(2) {
+    --draw-delay: 0.15s;
   }
-  .studio-project-description {
-    font-size: 9px;
+  .oxog-mark path:nth-child(3) {
+    --draw-delay: 0.3s;
+  }
+  .oxog-mark path:nth-child(4) {
+    --draw-delay: 0.45s;
+  }
+}
+@keyframes studio-logo-draw {
+  0% {
+    stroke-dashoffset: 400;
+  }
+  33%,
+  100% {
+    stroke-dashoffset: 0;
   }
 }
 .docs-layout {
@@ -2707,13 +2619,6 @@ code,
   .dashboard-events code,
   .dashboard-events i {
     font-size: 10px;
-  }
-  .studio-signature {
-    grid-template-columns: 140px minmax(0, 1fr) minmax(320px, 0.8fr);
-    gap: var(--layout-gap);
-  }
-  .studio-projects {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (min-width: 1280px) {
@@ -3930,7 +3835,7 @@ code,
   .traffic-packets {
     display: none;
   }
-  .studio-signature[data-logo-state] .studio-symbol path {
+  .studio-signature .oxog-mark path {
     stroke-dasharray: none;
     stroke-dashoffset: 0;
   }

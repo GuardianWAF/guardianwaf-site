@@ -71,7 +71,7 @@ export default function RootLayout({
       <body className={`${geist.variable} ${mono.variable}`}>
         <AnimatedBackground />
         <noscript>
-          <style>{`[data-reveal]{opacity:1!important;transform:none!important}.studio-symbol path{stroke-dasharray:none!important;stroke-dashoffset:0!important}`}</style>
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important}.oxog-mark path{stroke-dasharray:none!important;stroke-dashoffset:0!important}`}</style>
         </noscript>
         <a href="#main" className="skip-link">
           Skip to content

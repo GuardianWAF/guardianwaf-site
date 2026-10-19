@@ -258,3 +258,27 @@ test("encoded traversal cannot expose workspace source", async () => {
   assert.equal(response.status, 404);
   assert.doesNotMatch(await response.text(), /"dependencies"/);
 });
+
+test("the footer ends with one OXOG link and no additional project cards", async () => {
+  for (const page of pages) {
+    const html = await readFile(path.join(out, page), "utf8");
+    const footer = html.match(/<footer\b[\s\S]*?<\/footer>/)?.[0];
+    assert.ok(footer, page);
+    assert.match(
+      footer,
+      /<a[^>]*id="studio"[^>]*href="https:\/\/oxog.net"[^>]*>[\s\S]*?<\/a><\/footer>$/,
+    );
+    assert.equal((footer.match(/href="https:\/\/oxog.net"/g) || []).length, 1);
+    assert.match(footer, /PART OF A BIGGER PICTURE/);
+    assert.match(footer, /Small studio\./);
+    assert.match(footer, /Big ideas\./);
+    assert.match(footer, /Meet oxog.net/);
+    assert.doesNotMatch(
+      footer,
+      /studio-project|AGEZT|WrongStack|WrongTrace|UWAS/,
+    );
+    const logo = footer.match(/<svg class="oxog-mark"[\s\S]*?<\/svg>/)?.[0];
+    assert.ok(logo);
+    assert.equal((logo.match(/<path\b/g) || []).length, 4);
+  }
+});
