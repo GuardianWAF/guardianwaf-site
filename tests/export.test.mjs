@@ -221,6 +221,8 @@ test("social images, discovery metadata, and font licenses are included", async 
     "sitemap.xml",
     "licenses/Geist-OFL.txt",
     "licenses/GeistMono-OFL.txt",
+    "licenses/Space-Grotesk-OFL.txt",
+    "licenses/JetBrains-Mono-OFL.txt",
   ]) {
     const response = await fetch(`${origin}${base}/${file}`);
     assert.equal(response.status, 200, file);

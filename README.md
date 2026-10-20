@@ -71,7 +71,7 @@ To regenerate the committed assets:
 node scripts/generate-brand.mjs
 ```
 
-This optional generator uses the `fontkit` and `sharp` development dependencies. Assets are already included and ordinary builds do not run the generator. Geist and Geist Mono are self-hosted; their SIL Open Font Licenses are in `public/licenses/`. The original variable font used to outline wordmarks is in `scripts/fonts/` under the same license.
+This optional generator uses the `fontkit` and `sharp` development dependencies. Assets are already included and ordinary builds do not run the generator. Space Grotesk is the default interface typeface; JetBrains Mono is used for code and technical values. Both variable fonts are self-hosted through `next/font/local`, include Latin Extended and Turkish glyphs, and use centralized CSS variables. Quicksand is reserved as a token without loading an unused font. Their SIL Open Font Licenses are in `public/licenses/`. The fonts were converted losslessly from the full variable TTFs in the official Google Fonts repository (`ofl/spacegrotesk` and `ofl/jetbrainsmono`) to WOFF2 with fontTools. The original Geist variable font used to outline wordmarks remains in `scripts/fonts/` under its own license; vector brand assets are unchanged.
 
 ## Content and interaction notes
 

@@ -35,8 +35,10 @@ export function Reveal({
     <motion.div
       data-reveal
       className={className}
-      initial={reduced ? false : { opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={false}
+      whileInView={
+        reduced ? { opacity: 1, y: 0 } : { opacity: [0, 1], y: [20, 0] }
+      }
       viewport={{ once: true, amount: 0.1 }}
       transition={{ duration: reduced ? 0 : 0.65, delay: reduced ? 0 : delay }}
     >
@@ -117,7 +119,11 @@ export function Pipeline() {
         </span>
         <span className="demo-label">Interactive illustration</span>
       </div>
-      <div className="request-options" aria-label="Example requests">
+      <div
+        className="request-options"
+        role="group"
+        aria-label="Example requests"
+      >
         {requestExamples.map((item, i) => (
           <button
             key={item.name}
@@ -129,7 +135,12 @@ export function Pipeline() {
           </button>
         ))}
       </div>
-      <div className="request-line">
+      <div
+        className="request-line"
+        tabIndex={0}
+        role="region"
+        aria-label="Example HTTP request"
+      >
         <span className="request-method">HTTP</span>
         <code>{example.request}</code>
         <span className="request-blink">_</span>
@@ -267,7 +278,7 @@ export function DeploymentTabs() {
           <span>{current.file}</span>
           <CopyButton text={current.code} />
         </div>
-        <pre>
+        <pre tabIndex={0}>
           <code>{current.code}</code>
         </pre>
         <div className="code-note">

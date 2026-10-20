@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight, Menu, X } from "lucide-react";
 import { Github, LogoMark, Wordmark } from "./brand";
 import { REPO } from "@/lib/site";
@@ -11,15 +11,27 @@ import { AnimationToggle } from "./animation-toggle";
 
 export function Header() {
   const [menu, setMenu] = useState(false);
+  const menuTrigger = useRef<HTMLButtonElement>(null);
   useEffect(() => {
+    if (!menu) return;
+    const desktop = window.matchMedia("(min-width: 801px)");
+    const dismissOnDesktop = () => {
+      if (desktop.matches) setMenu(false);
+    };
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenu(false);
+      if (event.key === "Escape") {
+        setMenu(false);
+        menuTrigger.current?.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
+    desktop.addEventListener("change", dismissOnDesktop);
+    dismissOnDesktop();
     return () => {
       document.removeEventListener("keydown", onKey);
+      desktop.removeEventListener("change", dismissOnDesktop);
     };
-  }, []);
+  }, [menu]);
   return (
     <header className="site-header">
       <div className="nav-wrap">
@@ -49,6 +61,8 @@ export function Header() {
             <ArrowUpRight size={13} />
           </a>
           <button
+            ref={menuTrigger}
+            type="button"
             className="icon-button menu-toggle"
             aria-label={menu ? "Close navigation" : "Open navigation"}
             aria-expanded={menu}

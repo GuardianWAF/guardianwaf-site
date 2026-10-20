@@ -44,7 +44,7 @@ function Code({ code, file }: { code: string; file: string }) {
         <span>{file}</span>
         <CopyButton text={code} />
       </div>
-      <pre>
+      <pre tabIndex={0}>
         <code>{code}</code>
       </pre>
     </div>

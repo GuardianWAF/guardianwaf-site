@@ -23,8 +23,9 @@
   color-scheme: dark;
 }
 body {
-  --font-sans: var(--font-geist), Arial, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --font-sans: var(--font-space-grotesk), Arial, sans-serif;
+  --font-mono: var(--font-jetbrains), monospace;
+  --font-quicksand: "Quicksand", "Quicksand Fallback", sans-serif;
 }
 :root[data-theme="light"] {
   --background: #f5f8fd;
@@ -39,7 +40,7 @@ body {
   --faint: #e8eff9;
   --header: rgba(245, 248, 253, 0.94);
   --red: #b83c2c;
-  --amber: #8b650b;
+  --amber: #805b09;
   color-scheme: light;
 }
 * {
@@ -488,6 +489,9 @@ code,
   right: 0;
   top: calc(100% + 15px);
   width: 322px;
+  max-height: calc(100dvh - 110px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 20px;
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -661,6 +665,7 @@ code,
     top: 72px;
     right: 16px;
     width: min(322px, calc(100% - 32px));
+    max-height: calc(100dvh - 88px);
   }
 }
 .github-nav {
@@ -683,6 +688,9 @@ code,
   left: 0;
   right: 0;
   top: 82px;
+  max-height: calc(100dvh - 100px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--background);
   padding: 20px;
   border: 1px solid var(--border);
@@ -1452,8 +1460,12 @@ code,
   top: 48px;
   color: var(--subtle);
 }
-.stage-muted {
-  opacity: 0.28;
+.stage-muted .stage-icon,
+.stage-muted .stage-arrow {
+  opacity: 0.35;
+}
+.stage-muted .stage-icon {
+  border-style: dashed;
 }
 .stage-attack .stage-icon {
   color: var(--red);
@@ -1482,7 +1494,6 @@ code,
 }
 .result-verdict code {
   font-size: 9px;
-  opacity: 0.7;
   padding-left: 4px;
 }
 .request-result p {
@@ -1492,7 +1503,7 @@ code,
 }
 .result-score {
   margin-left: auto;
-  color: var(--subtle);
+  color: var(--muted);
   font-size: 8px;
   white-space: nowrap;
 }
@@ -1649,6 +1660,9 @@ code,
   font-size: 11px;
   line-height: 1.95;
   tab-size: 2;
+}
+.code-window pre:focus-visible {
+  outline-offset: -4px;
 }
 .code-note {
   display: flex;
@@ -2765,10 +2779,16 @@ code,
   .site-header {
     height: 72px;
   }
+  .menu-toggle {
+    display: flex;
+    width: 44px;
+    height: 44px;
+  }
   .wordmark {
     font-size: 23px;
   }
   .desktop-nav {
+    display: none;
     gap: 17px;
   }
   .desktop-nav a {
@@ -3114,11 +3134,7 @@ code,
   }
 }
 @media (max-width: 600px) {
-  .desktop-nav {
-    display: none;
-  }
   .menu-toggle {
-    display: flex;
     padding-right: 0;
   }
   .github-nav > span {
@@ -3532,7 +3548,7 @@ code,
     font-size: 12px;
   }
   .dashboard-top {
-    font-size: 7px;
+    font-size: 9px;
     padding: 13px 12px;
     gap: 7px;
   }
@@ -3540,7 +3556,7 @@ code,
     gap: 4px;
   }
   .dashboard-live {
-    font-size: 6px;
+    font-size: 8px;
   }
   .dashboard-separator {
     padding-inline: 1px;
@@ -3555,25 +3571,28 @@ code,
     font-size: 14px;
   }
   .dashboard-heading > span {
-    font-size: 6px;
+    font-size: 9px;
     padding: 5px;
     gap: 4px;
   }
   .dashboard-metrics {
     margin-inline: 12px;
+    grid-template-columns: 1fr;
   }
   .dashboard-metrics > div {
-    padding: 12px 7px;
+    padding: 14px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
   }
   .dashboard-metrics > div > span {
-    font-size: 6px;
+    font-size: 11px;
   }
   .dashboard-metrics strong {
-    font-size: 20px;
+    font-size: 26px;
     gap: 4px;
   }
   .dashboard-metrics small {
-    font-size: 4.8px;
+    font-size: 10px;
     line-height: 1.6;
   }
   .metric-sub {
@@ -3590,18 +3609,18 @@ code,
     margin-inline: 12px;
   }
   .dashboard-events > span {
-    font-size: 5px;
+    font-size: 9px;
   }
   .dashboard-events > div {
-    grid-template-columns: 49px 1fr 1fr 30px;
-    gap: 4px;
-    font-size: 5px;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 8px;
+    font-size: 10px;
   }
   .dashboard-events code {
-    font-size: 5.5px;
+    font-size: 10px;
   }
   .dashboard-events i {
-    font-size: 5px;
+    font-size: 10px;
     padding: 3px 4px;
   }
   .faq-section > div:first-child {

@@ -614,7 +614,7 @@ export default function Home() {
         </div>
         <div className="install-inline">
           <Terminal size={15} />
-          <code>{install}</code>
+          <code tabIndex={0}>{install}</code>
           <CopyButton text={install} label="Copy Go install command" />
         </div>
         <span className="cta-corner cta-corner-tl">+</span>

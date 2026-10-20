@@ -7,14 +7,16 @@ import { themeScript } from "@/lib/theme";
 import { animationScript } from "@/lib/animation-preference";
 import "./globals.css";
 
-const geist = localFont({
-  src: "./fonts/geist-latin.woff2",
-  variable: "--font-geist",
+const spaceGrotesk = localFont({
+  src: "./fonts/space-grotesk.woff2",
+  variable: "--font-space-grotesk",
+  weight: "300 700",
   display: "swap",
 });
 const mono = localFont({
-  src: "./fonts/geist-mono-latin.woff2",
-  variable: "--font-geist-mono",
+  src: "./fonts/jetbrains-mono.woff2",
+  variable: "--font-jetbrains",
+  weight: "100 800",
   display: "swap",
 });
 export const metadata: Metadata = {
@@ -68,7 +70,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script dangerouslySetInnerHTML={{ __html: animationScript }} />
       </head>
-      <body className={`${geist.variable} ${mono.variable}`}>
+      <body className={`${spaceGrotesk.variable} ${mono.variable}`}>
         <AnimatedBackground />
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}.oxog-mark path{stroke-dasharray:none!important;stroke-dashoffset:0!important}`}</style>
